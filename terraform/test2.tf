@@ -1,16 +1,13 @@
 provider "aws" {
-  region = "us-west-2"
+  region = "us-east-1"  # Change as needed
 }
 
-resource "aws_s3_bucket" "example" {
-  bucket = "my-unique-bucket-hs20250628"
+resource "aws_s3_bucket" "my_bucket" {
+  bucket = "my-unique-bucket-name-12345"  # Change to a globally unique name
+  acl    = "private"
+
   tags = {
-    Name        = "MyExampleBucket"
+    Name        = "MyBucket"
     Environment = "Dev"
   }
-}
-
-resource "aws_s3_bucket_acl" "example_acl" {
-  bucket = aws_s3_bucket.example.id
-  acl    = "private"
 }
