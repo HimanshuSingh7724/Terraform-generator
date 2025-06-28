@@ -1,9 +1,9 @@
 provider "aws" {
-  region = "us-west-1"  # Or use your actual configured region
+  region = "us-west-1"
 }
 
 resource "aws_s3_bucket" "my_bucket" {
-  bucket = "my-super-unique-bucket-jun28-2025"  # Replace with a unique name
+  bucket = "my-super-unique-bucket-jun28-2025"
 
   tags = {
     Name        = "MyTerraformBucket"
@@ -11,8 +11,4 @@ resource "aws_s3_bucket" "my_bucket" {
   }
 }
 
-resource "aws_s3_bucket_acl" "my_bucket_acl" {
-  bucket = aws_s3_bucket.my_bucket.id
-  acl    = "private"
-}
 
