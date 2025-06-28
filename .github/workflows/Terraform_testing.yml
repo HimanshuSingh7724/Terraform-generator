@@ -1,1 +1,86 @@
 name: Terraform AWS Pipeline
+
+on:
+  push:
+    branches:
+      - main
+    paths:
+      - terraform/**
+
+env:
+  AWS_REGION: 'us-east-1'
+  TF_LOG: INFO
+
+permissions:
+  contents: read
+
+jobs:
+  terraform:
+    name: Terraform Lifecycle
+    runs-on: ubuntu-latest
+    defaults:
+      run:
+        working-directory: terraform
+
+    steps:
+      - name: Checkout Repository
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+
+      # Step to delete all Terraform files except the latest committed one
+      - name: Clean up old Terraform files (keep latest)
+        run: |
+          # Get the latest commit hash
+          latest_commit_hash=$(git log -n 1 --pretty=format:"%H")
+          echo "Latest commit hash: $latest_commit_hash"
+
+          # List all terraform files in the directory
+          echo "Listing all terraform files..."
+          tf_files=$(find . -name "*.tf")
+          echo "Terraform files found: $tf_files"
+
+          # Delete files except the ones from the latest commit
+          for file in $tf_files; do
+            # Check if the file is part of the latest commit
+            file_commit_hash=$(git log -n 1 --pretty=format:"%H" -- $file)
+            if [ "$file_commit_hash" != "$latest_commit_hash" ]; then
+              echo "Deleting file: $file"
+              rm -f $file
+            else
+              echo "Keeping latest file: $file"
+            fi
+          done
+
+      - name: Configure AWS Credentials
+        uses: aws-actions/configure-aws-credentials@v4
+        with:
+          aws-access-key-id: ${{ secrets.AWS_ACCESS_KEY_ID }}
+          aws-secret-access-key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
+          aws-region: ${{ env.AWS_REGION }}
+
+      - name: Verify AWS Credentials
+        run: aws sts get-caller-identity
+
+      - name: Install Terraform
+        uses: hashicorp/setup-terraform@v3
+        with:
+          terraform_version: "1.7.0"
+
+      - name: Display Terraform Files
+        run: |
+          find . -name "*.tf" | sort
+          echo "Contents of provider files:"
+          cat $(find . -name "*provider*.tf") 2>/dev/null || echo "No provider files found"
+
+      - name: Terraform Init with Upgrade
+        run: terraform init -input=false -reconfigure -upgrade
+
+      - name: Terraform Validate
+        run: terraform validate
+
+      - name: Terraform Plan
+        run: terraform plan -input=false -out=tfplan
+
+      - name: Terraform Apply
+        run: terraform apply -auto-approve
