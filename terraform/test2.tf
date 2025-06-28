@@ -1,13 +1,13 @@
-provider "aws" {
-  region = "us-west-2"
-}
-
 resource "aws_s3_bucket" "example" {
-  bucket = "my-example-bucket-123456"
-  acl    = "private"
-
+  bucket = "your-unique-bucket-name-xyz123"
+  # acl removed
   tags = {
     Name        = "MyExampleBucket"
     Environment = "Dev"
   }
+}
+
+resource "aws_s3_bucket_acl" "example_acl" {
+  bucket = aws_s3_bucket.example.id
+  acl    = "private"
 }
