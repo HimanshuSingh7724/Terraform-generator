@@ -1,6 +1,9 @@
+provider "aws" {
+  region = "us-west-2"
+}
+
 resource "aws_s3_bucket" "example" {
-  bucket = "your-unique-bucket-name-xyz123"
-  # acl removed
+  bucket = "my-unique-bucket-hs20250628"
   tags = {
     Name        = "MyExampleBucket"
     Environment = "Dev"
