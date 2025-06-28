@@ -1,13 +1,18 @@
 provider "aws" {
-  region = "eu-north-1"  # Change as needed
+  region = "us-west-1"  # Or use your actual configured region
 }
 
 resource "aws_s3_bucket" "my_bucket" {
-  bucket = "my-unique-bucket-name-12345"  # Change to a globally unique name
-  acl    = "private"
+  bucket = "my-super-unique-bucket-jun28-2025"  # Replace with a unique name
 
   tags = {
-    Name        = "MyBucket"
+    Name        = "MyTerraformBucket"
     Environment = "Dev"
   }
 }
+
+resource "aws_s3_bucket_acl" "my_bucket_acl" {
+  bucket = aws_s3_bucket.my_bucket.id
+  acl    = "private"
+}
+
