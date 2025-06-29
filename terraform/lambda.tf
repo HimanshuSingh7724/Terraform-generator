@@ -30,8 +30,8 @@ resource "aws_lambda_function" "example_lambda" {
   handler       = "lambda_function.lambda_handler"
   runtime       = "python3.11"
 
-  filename         = "${path.module}/def_lambda.py"
-  source_code_hash = filebase64sha256("${path.module}/def_lambda.py")
+  filename         = "${path.module}/python/def_lambda.py"
+  source_code_hash = filebase64sha256("${path.module}/python/def_lambda.py")
 
   environment {
     variables = {
