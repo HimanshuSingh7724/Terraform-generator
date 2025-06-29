@@ -1,4 +1,4 @@
-name: CI Workflow
+name: Clean and Checkout Example
 
 on:
   push:
@@ -11,22 +11,17 @@ jobs:
     runs-on: ubuntu-latest
 
     steps:
-      # ✅ First, checkout your code (clones the git repo)
+      # ✅ Step 1: Checkout code (uses ONLY `uses`)
       - name: Checkout repository
         uses: actions/checkout@v4
 
-      # ✅ THEN clean the working directory (now .git exists)
+      # ✅ Step 2: Clean working directory (uses ONLY `run`)
       - name: Clean working directory
         run: |
           git reset --hard
           git clean -fdx
 
-      # Example command (optional)
-      - name: Run a command
-        run: echo "Repo is clean and ready"
+      # ✅ Step 3: Run something
+      - name: Build step
+        run: echo "The repo is clean and ready"
 
-        uses: actions/checkout@v4
-
-      # You can add more steps here
-      - name: Run some script
-        run: echo "Workspace is clean and code is checked out"
