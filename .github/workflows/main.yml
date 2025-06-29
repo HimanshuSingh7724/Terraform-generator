@@ -1,0 +1,24 @@
+name: CI Workflow
+
+on:
+  push:
+    branches: [ main ]
+  pull_request:
+    branches: [ main ]
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Clean working directory
+        run: |
+          git reset --hard
+          git clean -fdx
+
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      # You can add more steps here
+      - name: Run some script
+        run: echo "Workspace is clean and code is checked out"
