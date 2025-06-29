@@ -11,12 +11,20 @@ jobs:
     runs-on: ubuntu-latest
 
     steps:
+      # ✅ First, checkout your code (clones the git repo)
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      # ✅ THEN clean the working directory (now .git exists)
       - name: Clean working directory
         run: |
           git reset --hard
           git clean -fdx
 
-      - name: Checkout repository
+      # Example command (optional)
+      - name: Run a command
+        run: echo "Repo is clean and ready"
+
         uses: actions/checkout@v4
 
       # You can add more steps here
