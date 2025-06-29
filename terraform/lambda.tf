@@ -7,15 +7,13 @@ resource "aws_iam_role" "lambda_exec_role" {
 
   assume_role_policy = jsonencode({
     Version = "2012-10-17",
-    Statement = [
-      {
-        Action = "sts:AssumeRole",
-        Effect = "Allow",
-        Principal = {
-          Service = "lambda.amazonaws.com"
-        }
+    Statement = [{
+      Action = "sts:AssumeRole",
+      Effect = "Allow",
+      Principal = {
+        Service = "lambda.amazonaws.com"
       }
-    ]
+    }]
   })
 }
 
@@ -27,11 +25,11 @@ resource "aws_iam_role_policy_attachment" "lambda_basic_execution" {
 resource "aws_lambda_function" "example_lambda" {
   function_name = "example_lambda_function"
   role          = aws_iam_role.lambda_exec_role.arn
-  handler       = "lambda_function.lambda_handler"
+  handler       = "def_lambda.lambda_handler"  # def_lambda.py me lambda_handler function hona chahiye
   runtime       = "python3.11"
 
-  filename         = "${path.module}/python/def_lambda.py"
-  source_code_hash ="${path.module}/python"
+  filename         = "${path.module}/Python/def_lambda.zip"   # Ye zip file ka path hai
+  source_code_hash = filebase64sha256("${path.module}/Python/def_lambda.zip")
 
   environment {
     variables = {
