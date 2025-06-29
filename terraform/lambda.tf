@@ -22,17 +22,16 @@ resource "aws_iam_role_policy_attachment" "lambda_basic_execution" {
   policy_arn = "arn:aws:iam::aws:policy/service-role/AWSLambdaBasicExecutionRole"
 }
 
-# 🟡 ARCHIVE your Python file into ZIP using archive_file data source
 data "archive_file" "lambda" {
   type        = "zip"
-  source_file = "${path.module}/def_lambda.py"   # File is directly in the current directory
+  source_file = "${path.module}/def_lambda.py"
   output_path = "${path.module}/lambda_function_payload.zip"
 }
 
 resource "aws_lambda_function" "example_lambda" {
-  function_name = "example_lambda_function"
+  function_name = "reverse_number_lambda"
   role          = aws_iam_role.lambda_exec_role.arn
-  handler       = "def_lambda.lambda_handler"     # Make sure this is the function name inside def_lambda.py
+  handler       = "def_lambda.lambda_handler"
   runtime       = "python3.11"
 
   filename         = data.archive_file.lambda.output_path
@@ -44,6 +43,7 @@ resource "aws_lambda_function" "example_lambda" {
     }
   }
 }
+
 
 
 
