@@ -5,7 +5,7 @@ on:
     branches:
       - main
     paths:
-      - terraform/EC2 **
+      - terraform/ **
   workflow_dispatch:
 
 env:
@@ -21,7 +21,7 @@ jobs:
     runs-on: ubuntu-latest
     defaults:
       run:
-        working-directory: terraform/EC2
+        working-directory: terraform
 
     steps:
       - name: Checkout Repository
