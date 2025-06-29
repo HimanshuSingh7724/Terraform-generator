@@ -21,6 +21,11 @@ resource "aws_iam_role_policy_attachment" "lambda_basic_execution" {
   role       = aws_iam_role.lambda_exec_role.name
   policy_arn = "arn:aws:iam::aws:policy/service-role/AWSLambdaBasicExecutionRole"
 }
+data "archive_file" "lambda"{
+type  =  "zip"
+source_file =  "def_lambda.py"
+output_path = "lambda_function_payload.zip"
+}
 
 resource "aws_lambda_function" "example_lambda" {
   function_name = "example_lambda_function"
@@ -28,8 +33,8 @@ resource "aws_lambda_function" "example_lambda" {
   handler       = "def_lambda.lambda_handler"  # def_lambda.py me lambda_handler function hona chahiye
   runtime       = "python3.11"
 
-  filename         = "${path.module}/Python/def_lambda.zip"   # Ye zip file ka path hai
-  source_code_hash = filebase64sha256("${path.module}/Python/def_lambda.zip")
+  filename         = data.archive_file.lambda.output_path   # Ye zip file ka path hai
+  source_code_hash = data.archive_file.lambda.output_base64sha256
 
   environment {
     variables = {
