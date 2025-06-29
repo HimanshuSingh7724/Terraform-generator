@@ -1,10 +1,9 @@
 provider "aws" {
-  region = "eu-north-1"  # Apni region yahan set karein
+  region = "eu-north-1"
 }
 
 resource "aws_iam_role" "lambda_exec_role" {
   name = "lambda_exec_role"
-
   assume_role_policy = jsonencode({
     Version = "2012-10-17"
     Statement = [{
@@ -25,11 +24,11 @@ resource "aws_iam_role_policy_attachment" "lambda_basic_execution" {
 resource "aws_lambda_function" "example_lambda" {
   function_name = "example_lambda"
   role          = aws_iam_role.lambda_exec_role.arn
-  handler       = "lambda_function.lambda_handler"  # aapke python file mein function ka naam
+  handler       = "lambda_function.lambda_handler"
   runtime       = "python3.9"
 
-  filename         = "C:/Users/HIMANS~1/DOCUME~1/aws_lambda_function.zip"
-  source_code_hash = filebase64sha256("C:/Users/HIMANS~1/DOCUME~1/aws_lambda_function.zip")
+  filename         = "aws_lambda_function.zip"
+  source_code_hash = filebase64sha256("aws_lambda_function.zip")
 
   environment {
     variables = {
