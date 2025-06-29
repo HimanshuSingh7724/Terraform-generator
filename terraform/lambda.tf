@@ -1,8 +1,8 @@
 provider "aws" {
-  region = "us-west-1"  # Change to your preferred region
+  region = "eu-north-1"  # ← Change this to your AWS region
 }
 
-# Step 1: Create IAM role for Lambda
+# IAM Role for Lambda
 resource "aws_iam_role" "lambda_exec_role" {
   name = "lambda_exec_role"
 
@@ -20,20 +20,20 @@ resource "aws_iam_role" "lambda_exec_role" {
   })
 }
 
-# Step 2: Attach basic execution policy to the role
+# Attach AWSLambdaBasicExecutionRole for CloudWatch Logs
 resource "aws_iam_role_policy_attachment" "lambda_basic_execution" {
   role       = aws_iam_role.lambda_exec_role.name
   policy_arn = "arn:aws:iam::aws:policy/service-role/AWSLambdaBasicExecutionRole"
 }
 
-# Step 3: Automatically zip the function using archive_file
+# Archive the Python code
 data "archive_file" "lambda_zip" {
   type        = "zip"
   source_file = "${path.module}/lambda_function.py"
   output_path = "${path.module}/lambda_function_payload.zip"
 }
 
-# Step 4: Create the Lambda function
+# Lambda Function
 resource "aws_lambda_function" "example_lambda" {
   function_name = "example_lambda_function"
   role          = aws_iam_role.lambda_exec_role.arn
@@ -49,3 +49,4 @@ resource "aws_lambda_function" "example_lambda" {
     }
   }
 }
+
