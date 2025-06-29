@@ -22,10 +22,9 @@ resource "aws_iam_role_policy_attachment" "lambda_basic_execution" {
   policy_arn = "arn:aws:iam::aws:policy/service-role/AWSLambdaBasicExecutionRole"
 }
 
-# ✅ Fix path to python/def_lambda.py
 data "archive_file" "lambda" {
   type        = "zip"
-  source_file = "${path.module}/python/def_lambda.py"
+  source_file = "${path.module}/def_lambda.py"
   output_path = "${path.module}/lambda_function_payload.zip"
 }
 
@@ -44,5 +43,6 @@ resource "aws_lambda_function" "example_lambda" {
     }
   }
 }
+
 
 
