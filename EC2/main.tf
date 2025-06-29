@@ -13,7 +13,7 @@ provider "aws" {
 
 # Create EC2 instance
 resource "aws_instance" "my_ec2" {
-  ami           = "ami-090448e4b2b3e1a58" # Ubuntu 22.04 AMI in eu-north-1
+  ami           = "ami-042b4708b1d05f512" # Ubuntu 22.04 AMI in eu-north-1
   instance_type = "t3.micro"
 
   tags = {
