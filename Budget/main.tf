@@ -18,7 +18,7 @@ resource "aws_sns_topic" "budget_notifications" {
 resource "aws_sns_topic_subscription" "email_subscription" {
   topic_arn = aws_sns_topic.budget_notifications.arn
   protocol  = "email"
-  endpoint  = "your-email@example.com"  # 🔁 Replace with your actual email
+  endpoint  = "himanshusingh28094.com"  # 🔁 Replace with your actual email
 }
 
 resource "aws_budgets_budget" "monthly_budget" {
