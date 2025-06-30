@@ -4,7 +4,7 @@ provider "aws" {
 
 resource "aws_key_pair" "my_key"{
     key_name = "my_key"
-    public_key = "ssh-rsa AAAAB3NzaC1yc2EAAAADAQABAAABAQC...== user@DESKTOP-XXXXXXX"
+    public_key = file("${path.module}/my_key.pub")
 
 }
 
