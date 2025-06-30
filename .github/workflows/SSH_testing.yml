@@ -1,0 +1,55 @@
+name: Terraform AWS Pipeline
+
+on:
+  push:
+    branches:
+      - main
+    paths:
+      - SSH/**    # only run when files in ec2 folder change
+  workflow_dispatch:       # manual trigger option
+
+env:
+  AWS_REGION: 'eu-north-1'
+  TF_LOG: INFO
+
+permissions:
+  contents: read
+
+jobs:
+  terraform:
+    name: Terraform Lifecycle
+    runs-on: ubuntu-latest
+    defaults:
+      run:
+        working-directory: SSH   # <--- set working directory here
+
+    steps:
+      - name: Checkout Repository
+        uses: actions/checkout@v4
+
+      - name: Configure AWS Credentials
+        uses: aws-actions/configure-aws-credentials@v4
+        with:
+          aws-access-key-id: ${{ secrets.AWS_ACCESS_KEY }}
+          aws-secret-access-key: ${{ secrets.AWS_SECRET_KEY }}
+          aws-region: ${{ env.AWS_REGION }}
+
+      - name: Verify AWS Credentials
+        run: aws sts get-caller-identity
+
+      - name: Install Terraform
+        uses: hashicorp/setup-terraform@v3
+        with:
+          terraform_version: "1.7.0"
+
+      - name: Terraform Init
+        run: terraform init -input=false
+
+      - name: Terraform Validate
+        run: terraform validate
+
+      - name: Terraform Plan
+        run: terraform plan -input=false -out=tfplan
+
+      - name: Terraform Apply
+        run: terraform apply -auto-approve tfplan
