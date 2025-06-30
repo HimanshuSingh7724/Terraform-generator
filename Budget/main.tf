@@ -25,7 +25,7 @@ resource "aws_budgets_budget" "monthly_budget" {
     threshold_type      = "PERCENTAGE"
     threshold           = 100
     subscriber_email_addresses = [
-      "your-email@example.com"  # Replace with your email
+      "himanshusingh28094@gmail.com"  # Replace with your email
     ]
     subscriber_sns_topic_arns = [
       aws_sns_topic.budget_notifications.arn
