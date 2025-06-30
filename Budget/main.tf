@@ -1,17 +1,20 @@
 provider "aws" {
-  region = "eu-north-1"
+  region = "us-east-1" # Budget service is only supported in us-east-1
 }
 
+# SNS topic for budget alerts
 resource "aws_sns_topic" "budget_notifications" {
   name = "budget-notification-topic"
 }
 
+# Subscribe your email to the SNS topic
 resource "aws_sns_topic_subscription" "email_subscription" {
   topic_arn = aws_sns_topic.budget_notifications.arn
   protocol  = "email"
-  endpoint  = "himanshusingh28094.com"
+  endpoint  = "himanshusingh28094@gmail.com"  # ✅ Use a valid email address
 }
 
+# AWS Budget configuration
 resource "aws_budgets_budget" "monthly_budget" {
   name         = "MonthlyBudget"
   budget_type  = "COST"
@@ -19,16 +22,16 @@ resource "aws_budgets_budget" "monthly_budget" {
   limit_unit   = "USD"
   time_unit    = "MONTHLY"
 
-  notifications_with_subscribers {
+  notification {
+    comparison_operator = "GREATER_THAN"
+    notification_type   = "ACTUAL"
+    threshold           = 100
+    threshold_type      = "PERCENTAGE"
+
     subscriber {
       subscription_type = "SNS"
       address           = aws_sns_topic.budget_notifications.arn
     }
-    notification {
-      notification_type   = "ACTUAL"
-      comparison_operator = "GREATER_THAN"
-      threshold_type      = "PERCENTAGE"
-      threshold           = 100
-    }
   }
 }
+
