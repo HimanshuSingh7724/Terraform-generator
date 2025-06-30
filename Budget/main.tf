@@ -1,14 +1,5 @@
-terraform {
-  required_providers {
-    aws = {
-      source  = "hashicorp/aws"
-      version = "~> 5.0"
-    }
-  }
-}
-
 provider "aws" {
-  region = "us-east-1"  # Budgets only supported in us-east-1
+  region = "eu-north-1"
 }
 
 resource "aws_sns_topic" "budget_notifications" {
@@ -18,7 +9,7 @@ resource "aws_sns_topic" "budget_notifications" {
 resource "aws_sns_topic_subscription" "email_subscription" {
   topic_arn = aws_sns_topic.budget_notifications.arn
   protocol  = "email"
-  endpoint  = "your-email@example.com"  # Replace with your actual email
+  endpoint  = "himanshusingh28094.com"
 }
 
 resource "aws_budgets_budget" "monthly_budget" {
@@ -29,16 +20,15 @@ resource "aws_budgets_budget" "monthly_budget" {
   time_unit    = "MONTHLY"
 
   notifications_with_subscribers {
-    notification {
-      notification_type   = "ACTUAL"
-      threshold_type      = "PERCENTAGE"
-      threshold           = 100
-      comparison_operator = "GREATER_THAN"
-    }
-
     subscriber {
       subscription_type = "SNS"
       address           = aws_sns_topic.budget_notifications.arn
+    }
+    notification {
+      notification_type   = "ACTUAL"
+      comparison_operator = "GREATER_THAN"
+      threshold_type      = "PERCENTAGE"
+      threshold           = 100
     }
   }
 }
