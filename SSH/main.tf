@@ -8,7 +8,7 @@ resource "aws_key_pair" "my_key"{
 
 }
 
-resource "aws_instance" "example" {
+resource "aws_instance" "example" { 
     ami= "ami-042b4708b1d05f512"
     instance_type = "t3.micro"
     key_name = aws_key_pair.my_key.key_name
