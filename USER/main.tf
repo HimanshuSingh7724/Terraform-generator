@@ -12,7 +12,7 @@ resource "aws_iam_group" "dev_group" {
 
 resource "aws_iam_user_group_membership" "dev_membership" {
     user = aws_iam_user.dev_user.name
-    group = [aws_iam_group.dev_group.name]
+    groups = [aws_iam_group.dev_group.name]
 }
 
 resource "aws_iam_policy" "s3_read_only" {
