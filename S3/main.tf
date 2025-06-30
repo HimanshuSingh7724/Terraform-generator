@@ -12,20 +12,15 @@ provider "aws" {
 }
 
 resource "aws_s3_bucket" "public_bucket" {
-  bucket = "my-public-bucket-unique-123456-himanshu"  # change name to be unique
+  bucket = "my-public-bucket-unique-123456-himanshu"
 }
 
-resource "aws_s3_bucket_website_configuration" "public_website" {
+resource "aws_s3_bucket_ownership_controls" "example" {
   bucket = aws_s3_bucket.public_bucket.id
 
-  index_document {
-    suffix = "index.html"
+  rule {
+    object_ownership = "BucketOwnerEnforced"
   }
-}
-
-resource "aws_s3_bucket_acl" "public_bucket_acl" {
-  bucket = aws_s3_bucket.public_bucket.id
-  acl    = "public-read"
 }
 
 resource "aws_s3_bucket_public_access_block" "public_access" {
@@ -35,6 +30,14 @@ resource "aws_s3_bucket_public_access_block" "public_access" {
   block_public_policy     = false
   ignore_public_acls      = false
   restrict_public_buckets = false
+}
+
+resource "aws_s3_bucket_website_configuration" "public_website" {
+  bucket = aws_s3_bucket.public_bucket.id
+
+  index_document {
+    suffix = "index.html"
+  }
 }
 
 resource "aws_s3_bucket_policy" "public_bucket_policy" {
