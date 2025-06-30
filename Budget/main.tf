@@ -13,7 +13,7 @@ resource "aws_sns_topic_subscription" "email_subscription" {
 }
 
 resource "aws_budgets_budget" "monthly_budget" {
-  name         = "MonthlyBudget"
+  name         = "MonthlyBudget-v2"
   budget_type  = "COST"
   limit_amount = "2"
   limit_unit   = "USD"
