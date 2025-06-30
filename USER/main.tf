@@ -6,7 +6,7 @@ resource "aws_iam_user" "dev_user" {
     name = "developer_user"
 }
 
-resource "aws_iam_group" "dev_group" {
+resource "aws_iam_group" "dev_group" { 
     name = "developer"
 }
 
