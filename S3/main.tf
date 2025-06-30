@@ -8,7 +8,7 @@ resource "aws_s3_bucket" "private_bucket" {
 }
 
 resource "aws_s3_bucket" "public_bucket" {
-  bucket = "my-public-bucket-unique-123456"  # globally unique name
+  bucket = "my-public-bucket-unique-123456"   # globally unique name
   acl    = "public-read"
 
   website {
