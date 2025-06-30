@@ -1,5 +1,5 @@
 provider "aws" {
-  region = "us-east-1" # Budgets are only supported in us-east-1
+  region = "eu-north-1" # Budgets are only supported in us-east-1
 }
 
 resource "aws_sns_topic" "budget_notifications" {
