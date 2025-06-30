@@ -1,5 +1,5 @@
 provider "aws" {
-    resion = "eu-north-1"
+    region = "eu-north-1"
 }
 
 resource "aws_security_group" "example_sg" {
