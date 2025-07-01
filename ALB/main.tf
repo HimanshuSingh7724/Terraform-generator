@@ -58,7 +58,7 @@ resource "aws_lb" "app_alb" {
   name               = "app-alb"
   load_balancer_type = "application"
   security_groups    = [aws_security_group.alb_sg.id]
-  subnets            = ["subnet-aaa", "subnet-bbb"]
+  subnets            = ["subnet-0609d48d7653438b5", "subnet-024aa601a4696585c"]
 }
 resource "aws_lb_target_group" "app_tg" {
   name     = "app-tg"
