@@ -4,7 +4,7 @@ provider "aws" {
 
 # Modified SG name to avoid "already exists" error
 resource "aws_security_group" "alb_sg" {
-  name        = "alb_sg_tf"  # changed name
+  name        = "alb_sg_tf"  # changed name 
   description = "Allow HTTP to ALB and outbound to instances"
   vpc_id      = "vpc-04f2046632b609fcc"
 
