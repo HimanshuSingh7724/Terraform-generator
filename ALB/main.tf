@@ -33,6 +33,7 @@ resource "aws_security_group" "app_sg" {
     protocol        = "tcp"
     security_groups = [aws_security_group.alb_sg.id]
   }
+}
 resource "aws_instance" "app_instances" {
   count         = 2
   ami           = "ami-042b4708b1d05f512"
