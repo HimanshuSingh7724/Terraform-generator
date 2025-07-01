@@ -4,7 +4,7 @@ provider "aws" {
 resource "aws_security_group" "alb_sg" {
   name        = "alb_sg"
   description = "Allow HTTP to ALB and outbound to instances"
-  vpc_id      = "vpc-04f2046632b609fcc"
+  vpc_id      = "vpc-04f2046632b609fcc"           
 
     ingress {
     description = "HTTP from anywhere"
