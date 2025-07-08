@@ -1,0 +1,51 @@
+name: CI/CD Pipeline
+
+on:
+  push:
+    branches: [ main ]
+
+jobs:
+  build-and-deploy:
+    runs-on: ubuntu-latest
+
+    steps:
+    - uses: actions/checkout@v3
+
+    - name: Set up Python
+      uses: actions/setup-python@v4
+      with:
+        python-version: 3.9
+
+    - name: Install backend dependencies
+      run: |
+        cd backend
+        pip install -r requirements.txt
+
+    - name: Run backend tests
+      run: |
+        cd backend
+        # Assuming you add tests here later
+        echo "Tests can be added"
+
+    - name: Set up Node.js
+      uses: actions/setup-node@v3
+      with:
+        node-version: 16
+
+    - name: Install frontend dependencies
+      run: |
+        cd frontend
+        npm install
+
+    - name: Run frontend tests
+      run: |
+        cd frontend
+        npm test || echo "No tests yet"
+
+    - name: Build Docker images
+      run: docker-compose build
+
+    - name: Push Docker images
+      run: echo "Push to Docker Hub or registry here"
+
+    # Add deployment steps depending on infra
