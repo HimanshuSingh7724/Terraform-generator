@@ -36,7 +36,7 @@ resource "aws_security_group" "allow_ssh_http" {
 }
 
 resource "aws_instance" "web" {
-  ami           = "ami-07eced7b8e89e1e99"  # ✅ Amazon Linux 2 AMI (eu-north-1)
+  ami           = "ami-09278528675a8d54e"  # ✅ Amazon Linux 2 AMI (eu-north-1)
   instance_type = "t3.micro"
   key_name      = "my_key"                # ✅ Make sure this key exists
 
