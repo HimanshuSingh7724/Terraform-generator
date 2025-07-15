@@ -12,7 +12,7 @@ resource "aws_security_group" "allow_ssh_http" {
   vpc_id      = data.aws_vpc.default.id
 
   ingress {
-    description = "Allow SSH"
+    description = "Allow SSH"          
     from_port   = 22
     to_port     = 22
     protocol    = "tcp"
