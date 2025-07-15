@@ -3,7 +3,7 @@ provider "aws" {
 }
 
 resource "aws_instance" "web" {
-  ami           = "ami-042b4708b1d05f512"   # Amazon Linux 2 AMI
+  ami           = "ami-09278528675a8d54e"   # Amazon Linux 2 AMI
   instance_type = "t2.micro"
   key_name      = "my_key"                 # EC2 key pair (already created in AWS)
 
