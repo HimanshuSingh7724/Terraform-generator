@@ -3,9 +3,9 @@ provider "aws" {
 }
 
 resource "aws_instance" "web" {
-  ami           = "ami-042b4708b1d05f512"   # Amazon Linux 2 AMI (region specific)
+  ami           = "ami-042b4708b1d05f512"   # Amazon Linux 2 AMI
   instance_type = "t2.micro"
-  key_name      = "my_key"            # AWS EC2 key pair ka naam
+  key_name      = "my_key"                 # EC2 key pair (already created in AWS)
 
   provisioner "remote-exec" {
     inline = [
@@ -19,7 +19,7 @@ resource "aws_instance" "web" {
     connection {
       type        = "ssh"
       user        = "ec2-user"
-      private_key = file("~/.ssh/private_key.pem")
+      private_key = var.private_key         # 🔑 GitHub Secret se milega
       host        = self.public_ip
     }
   }
