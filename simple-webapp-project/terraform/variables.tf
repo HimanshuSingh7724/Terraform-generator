@@ -1,5 +1,4 @@
 variable "private_key" {
-  description = "Private key content for SSH connection"
+  description = "SSH Private Key content"
   type        = string
-  sensitive   = true
 }
