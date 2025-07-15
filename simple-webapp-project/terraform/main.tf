@@ -4,7 +4,7 @@ provider "aws" {
 
 resource "aws_instance" "web" {
   ami           = "ami-09278528675a8d54e"   # Amazon Linux 2 AMI
-  instance_type = "t2.micro"
+  instance_type = "t3.micro"
   key_name      = "my_key"                 # EC2 key pair (already created in AWS)
 
   provisioner "remote-exec" {
