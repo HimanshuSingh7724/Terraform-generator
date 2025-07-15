@@ -1,4 +1,4 @@
 variable "private_key" {
-  description = "SSH Private Key content"
+  description = "EC2 private key for SSH access"
   type        = string
 }
