@@ -36,9 +36,9 @@ resource "aws_security_group" "allow_ssh_http" {
 }
 
 resource "aws_instance" "web" {
-  ami           = "ami-09278528675a8d54e"   # ✅ Valid AMI for eu-north-1
+  ami           = "ami-09278528675a8d54e"   # Amazon Linux 2 AMI in eu-north-1
   instance_type = "t3.micro"
-  key_name      = "my_key"                  # ✅ This must exist in AWS > EC2 > Key Pairs
+  key_name      = "private_key"             # ✅ Must match the name of the EC2 Key Pair in AWS console
 
   security_groups = [aws_security_group.allow_ssh_http.name]
 
@@ -53,10 +53,10 @@ resource "aws_instance" "web" {
 
     connection {
       type        = "ssh"
-      user        = "ec2-user"
-      private_key = var.private_key  # 👇 This is set via environment variable or .tfvars file
+      user        = "ec2-user"  # Use "ubuntu" for Ubuntu AMIs, "ec2-user" for Amazon Linux
+      private_key = file("C:/Users/HIMANSHU SINGH/Downloads/private_key.pem")  # ✅ Replace with actual path to your key
       host        = self.public_ip
-      timeout     = "20m"
+      timeout     = "10m"
     }
   }
 
