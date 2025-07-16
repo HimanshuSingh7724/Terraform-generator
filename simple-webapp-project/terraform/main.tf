@@ -1,7 +1,7 @@
 provider "aws" {
   region = "eu-north-1"
 }
-  
+
 data "aws_vpc" "default" {
   default = true
 }
@@ -38,7 +38,7 @@ resource "aws_security_group" "allow_ssh_http" {
 resource "aws_instance" "web" {
   ami           = "ami-09278528675a8d54e"   # Amazon Linux 2 AMI in eu-north-1
   instance_type = "t3.micro"
-  key_name      = "private_key"             # Must match EC2 key pair name created in AWS
+  key_name      = "private_key"             # This must match the key pair name created in AWS
 
   security_groups = [aws_security_group.allow_ssh_http.name]
 
@@ -48,13 +48,13 @@ resource "aws_instance" "web" {
       "sudo yum install docker -y",
       "sudo service docker start",
       "sudo usermod -a -G docker ec2-user",
-      "docker run -d -p 80:80 himanshusingh28094/flask-app"
+      "sudo docker run -d -p 80:80 himanshusingh28094/flask-app"
     ]
 
     connection {
       type        = "ssh"
       user        = "ec2-user"
-      private_key = file(var.private_key_path)  # Using variable instead of hardcoded path
+      private_key = file(var.private_key_path)  # Use var from .tfvars file or CLI
       host        = self.public_ip
       timeout     = "10m"
     }
