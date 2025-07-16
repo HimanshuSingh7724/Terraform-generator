@@ -54,7 +54,7 @@ resource "aws_instance" "web" {
     connection {
       type        = "ssh"
       user        = "ec2-user"
-      private_key = "${var.EC2_PRIVATE_KEY}"  # 👇 This is set via environment variable or .tfvars file
+      private_key = var.private_key  # 👇 This is set via environment variable or .tfvars file
       host        = self.public_ip
       timeout     = "10m"
     }
