@@ -2,12 +2,6 @@ provider "aws" {
   region = "eu-north-1"
 }
 
-variable "private_key" {
-  description = "EC2 Private Key"
-  type        = string
-  sensitive   = true
-}
-
 data "aws_vpc" "default" {
   default = true
 }
@@ -42,9 +36,9 @@ resource "aws_security_group" "allow_ssh_http" {
 }
 
 resource "aws_instance" "web" {
-  ami           = "ami-09278528675a8d54e"  # ✅ Valid AMI for eu-north-1
+  ami           = "ami-09278528675a8d54e"   # ✅ Valid AMI for eu-north-1
   instance_type = "t3.micro"
-  key_name      = "private_key"            # ✅ Replace with your actual EC2 Key Pair name
+  key_name      = "my_key"                  # ✅ This must exist in AWS > EC2 > Key Pairs
 
   security_groups = [aws_security_group.allow_ssh_http.name]
 
@@ -60,7 +54,7 @@ resource "aws_instance" "web" {
     connection {
       type        = "ssh"
       user        = "ec2-user"
-      private_key = var.private_key
+      private_key = "${var.EC2_PRIVATE_KEY}"  # 👇 This is set via environment variable or .tfvars file
       host        = self.public_ip
       timeout     = "10m"
     }
