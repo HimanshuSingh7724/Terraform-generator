@@ -56,7 +56,7 @@ resource "aws_instance" "web" {
       user        = "ec2-user"
       private_key = var.private_key  # 👇 This is set via environment variable or .tfvars file
       host        = self.public_ip
-      timeout     = "10m"
+      timeout     = "20m"
     }
   }
 
