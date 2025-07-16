@@ -1,10 +1,16 @@
 provider "aws" {
   region = "eu-north-1"
 }
-  
-data "aws_vpc" "default" {          
-  default = true      
-}    
+
+variable "private_key" {
+  description = "EC2 Private Key"
+  type        = string
+  sensitive   = true
+}
+
+data "aws_vpc" "default" {
+  default = true
+}
 
 resource "aws_security_group" "allow_ssh_http" {
   name        = "allow_ssh_http"
@@ -12,7 +18,7 @@ resource "aws_security_group" "allow_ssh_http" {
   vpc_id      = data.aws_vpc.default.id
 
   ingress {
-    description = "Allow SSH"          
+    description = "Allow SSH"
     from_port   = 22
     to_port     = 22
     protocol    = "tcp"
@@ -36,9 +42,9 @@ resource "aws_security_group" "allow_ssh_http" {
 }
 
 resource "aws_instance" "web" {
-  ami           = "ami-09278528675a8d54e"  # ✅ Amazon Linux 2 AMI (eu-north-1)
+  ami           = "ami-09278528675a8d54e"  # ✅ Valid AMI for eu-north-1
   instance_type = "t3.micro"
-  key_name      = "my_key"                # ✅ Make sure this key exists
+  key_name      = "private_key"            # ✅ Replace with your actual EC2 Key Pair name
 
   security_groups = [aws_security_group.allow_ssh_http.name]
 
@@ -54,9 +60,9 @@ resource "aws_instance" "web" {
     connection {
       type        = "ssh"
       user        = "ec2-user"
-      private_key = var.private_key       # 🔐 Passed via GitHub Secret
+      private_key = var.private_key
       host        = self.public_ip
-      timeout     = "10m"                 # ✅ Correct placement here
+      timeout     = "10m"
     }
   }
 
