@@ -50,8 +50,8 @@ jobs:
         AWS_ACCESS_KEY_ID: ${{ secrets.AWS_ACCESS_KEY }}
         AWS_SECRET_ACCESS_KEY: ${{ secrets.AWS_SECRET_KEY }}
         AWS_REGION: ${{ secrets.AWS_REGION }}
-        TF_VAR_private_key: python-todo-app/terraform/private_key.pem
-        TF_VAR_key_name: ${{ secrets.EC2_PRIVATE_KEY }}
+        TF_VAR_private_key_path: python-todo-app/terraform/private_key.pem
+        TF_VAR_key_name: ${{ secrets.EC2_Private_Key }}
         TF_VAR_docker_image: ${{ secrets.DOCKER_USERNAME }}/python-todo-app:${{ github.sha }}
       run: |
         terraform init
