@@ -12,12 +12,8 @@ jobs:
     - name: Checkout python-todo-app folder only
       uses: actions/checkout@v3
       with:
-        # Checkout the repo, but fetch only the python-todo-app folder
-        # Note: GitHub Actions does not support partial checkout by default,
-        # but you can do sparse checkout like this:
         fetch-depth: 1
-        # We'll enable sparse checkout next
-        sparse-checkout: python-todo-app/
+        sparse-checkout: true
 
     - name: Configure sparse checkout
       run: |
@@ -39,12 +35,11 @@ jobs:
       run: |
         sudo apt update && sudo apt install -y unzip curl gnupg software-properties-common
         curl -fsSL https://apt.releases.hashicorp.com/gpg | gpg --dearmor | sudo tee /usr/share/keyrings/hashicorp-archive-keyring.gpg > /dev/null
-        echo "deb [signed-by=/usr/share/keyrings/hashicorp-archive-keyring.gpg] https://apt.releases.hashicorp.com $(lsb_release -cs) main" \
-        | sudo tee /etc/apt/sources.list.d/hashicorp.list
+        echo "deb [signed-by=/usr/share/keyrings/hashicorp-archive-keyring.gpg] https://apt.releases.hashicorp.com $(lsb_release -cs) main" | sudo tee /etc/apt/sources.list.d/hashicorp.list
         sudo apt update && sudo apt install terraform -y
 
     - name: Terraform Init and Apply
-      working-directory: ./terraform
+      working-directory: python-todo-app/terraform
       env:
         AWS_ACCESS_KEY_ID: ${{ secrets.AWS_ACCESS_KEY_ID }}
         AWS_SECRET_ACCESS_KEY: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
