@@ -1,7 +1,7 @@
 name: CI/CD → Terraform Deploy
 
 on:
-  push:
+  push: 
     branches: [ main ]
   
 jobs:
