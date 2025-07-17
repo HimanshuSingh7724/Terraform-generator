@@ -33,7 +33,7 @@ resource "aws_security_group" "sg" {
 }
 
 resource "aws_instance" "web" {
-  ami           = "ami-0c2b8ca1dad447f8a" # Linux AMI in eu-north-1
+  ami           = "ami-09278528675a8d54e" # Linux AMI in eu-north-1
   instance_type = "t3.micro"
   key_name      = var.key_name
   security_groups = [aws_security_group.sg.name]
