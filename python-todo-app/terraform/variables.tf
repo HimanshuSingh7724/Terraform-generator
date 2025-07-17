@@ -1,5 +1,9 @@
+variable "docker_image" {
+  description = "Docker image to deploy"
+  type        = string
+}
 
-variable "private_key_path" {
-  description = "Path to the private key file"
+variable "private_key" {
+  description = "EC2 private key for SSH connection"
   type        = string
 }
