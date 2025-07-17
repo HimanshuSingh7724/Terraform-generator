@@ -45,7 +45,8 @@ resource "aws_instance" "web" {
       "sudo yum install docker -y",
       "sudo service docker start",
       "sudo usermod -a -G docker ec2-user",
-      "sudo docker run -d -p 80:80 himanshusingh28094/flask-app"
+      "sudo docker pull ${var.docker_image}",       # 🐳 Pull image passed from GitHub Actions
+      "sudo docker run -d -p 80:80 ${var.docker_image}"
     ]
 
     connection {
