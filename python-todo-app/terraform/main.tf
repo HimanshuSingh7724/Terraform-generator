@@ -2,12 +2,12 @@ provider "aws" {
   region = "eu-north-1"
 }
 
-data "aws_vpc" "default" { 
+data "aws_vpc" "default" {
   default = true
 }
 
 resource "aws_security_group" "sg" {
-  name   = "http-ssh-group" # ✅ FIX: Not starting with "sg-"
+  name   = "http-ssh-group"
   vpc_id = data.aws_vpc.default.id
 
   ingress {
@@ -33,10 +33,10 @@ resource "aws_security_group" "sg" {
 }
 
 resource "aws_instance" "web" {
-  ami           = "ami-09278528675a8d54e" # Linux AMI in eu-north-1
-  instance_type = "t3.micro"
-  key_name      = private_key
-  security_groups = [aws_security_group.sg.name]
+  ami               = "ami-09278528675a8d54e"
+  instance_type     = "t3.micro"
+  key_name          = var.key_name
+  security_groups   = [aws_security_group.sg.name]
 
   provisioner "remote-exec" {
     inline = [
