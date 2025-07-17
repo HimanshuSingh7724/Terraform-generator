@@ -3,6 +3,6 @@ variable "private_key_path" {
   type        = string
 }
 variable "docker_image" {
-  description = "The Docker image to deploy"
+  description = "Docker image to run"
   type        = string
-}
+  default     = "your-docker-image"
