@@ -7,7 +7,7 @@ data "aws_vpc" "default" {
 }
 
 resource "aws_security_group" "sg" {
-  name   = "sg-http-ssh"
+  name   = "http-ssh-group" # ✅ FIX: Not starting with "sg-"
   vpc_id = data.aws_vpc.default.id
 
   ingress {
