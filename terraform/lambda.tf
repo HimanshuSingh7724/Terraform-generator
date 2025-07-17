@@ -1,6 +1,3 @@
-provider "aws" {
-  region = "us-west-1"
-}
 
 resource "aws_iam_role" "lambda_exec_role" {
   name = "lambda_exec_role_v3"  # ✅ Updated name
