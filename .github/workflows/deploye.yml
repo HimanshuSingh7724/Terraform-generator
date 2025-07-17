@@ -9,8 +9,20 @@ jobs:
     runs-on: ubuntu-latest
 
     steps:
-    - name: Checkout Code
+    - name: Checkout python-todo-app folder only
       uses: actions/checkout@v3
+      with:
+        # Checkout the repo, but fetch only the python-todo-app folder
+        # Note: GitHub Actions does not support partial checkout by default,
+        # but you can do sparse checkout like this:
+        fetch-depth: 1
+        # We'll enable sparse checkout next
+        sparse-checkout: python-todo-app/
+
+    - name: Configure sparse checkout
+      run: |
+        git sparse-checkout init --cone
+        git sparse-checkout set python-todo-app
 
     - name: Set up Docker Buildx
       uses: docker/setup-buildx-action@v2
