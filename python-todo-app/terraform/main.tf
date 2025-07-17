@@ -35,7 +35,7 @@ resource "aws_security_group" "sg" {
 resource "aws_instance" "web" {
   ami               = "ami-09278528675a8d54e"
   instance_type     = "t3.micro"
-  key_name          = var.key_name
+  key_name          = "private_key"
   security_groups   = [aws_security_group.sg.name]
 
   provisioner "remote-exec" {
@@ -50,7 +50,7 @@ resource "aws_instance" "web" {
     connection {
       type        = "ssh"
       user        = "ec2-user"
-      private_key = var.private_key_content
+      private_key = file(var.private_key_path)
       host        = self.public_ip
     }
   }
