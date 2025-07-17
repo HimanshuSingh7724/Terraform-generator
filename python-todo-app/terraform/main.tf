@@ -41,8 +41,11 @@ resource "aws_instance" "web" {
   provisioner "remote-exec" {
     inline = [
       "sudo yum update -y",
-      "sudo amazon-linux-extras install docker -y",
-      "sudo service docker start",
+      "sudo yum install -y docker",
+      "sudo systemctl start docker",
+      "sudo systemctl enable docker",
+      "sudo usermod -aG docker ec2-user",
+      "newgrp docker",
       "sudo docker pull ${var.docker_image}",
       "sudo docker run -d -p 80:80 ${var.docker_image}"
     ]
@@ -52,8 +55,10 @@ resource "aws_instance" "web" {
       user        = "ec2-user"
       private_key = file(var.private_key_path)
       host        = self.public_ip
+      timeout     = "10m"
     }
   }
+
 
   tags = {
     Name = "Flask-Todo-App"
