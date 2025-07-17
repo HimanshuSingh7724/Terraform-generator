@@ -16,7 +16,7 @@ jobs:
       uses: docker/setup-buildx-action@v2
 
     - name: Build Docker Image
-      run: docker build -t ${{ secrets.DOCKER_USERNAME }}/python-todo-app:${{ github.sha }} .
+      run: docker build -t ${{ secrets.DOCKER_USERNAME }}/python-todo-app:${{ github.sha }} -f python-todo-app/Dockerfile python-todo-app
 
     - name: Push Docker Image to DockerHub
       run: |
