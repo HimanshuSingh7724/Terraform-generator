@@ -2,7 +2,7 @@ provider "aws" { region = "eu-north-1" }
 
 data "aws_vpc" "default" { default = true }
 
-resource "aws_security_group" "sg" {
+resource "aws_security_group" "sg" {  
   name = "sg-http-ssh"  
   vpc_id = data.aws_vpc.default.id
 
