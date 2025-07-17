@@ -43,15 +43,14 @@ resource "aws_instance" "web" {
       "sudo yum update -y",
       "sudo amazon-linux-extras install docker -y",
       "sudo service docker start",
-      "sudo docker pull $DOCKER_IMAGE",
-      "sudo docker run -d -p 80:80 $DOCKER_IMAGE"
+      "sudo docker pull ${var.docker_image}",
+      "sudo docker run -d -p 80:80 ${var.docker_image}"
     ]
 
     connection {
       type        = "ssh"
       user        = "ec2-user"
       private_key = var.private_key_content
-
       host        = self.public_ip
     }
   }
