@@ -1,8 +1,8 @@
 provider "aws" {
   region = "eu-north-1"
-} 
+}
 
-data "aws_vpc" "default" { 
+data "aws_vpc" "default" {
   default = true
 }
 
@@ -33,32 +33,21 @@ resource "aws_security_group" "sg" {
 }
 
 resource "aws_instance" "web" {
-  ami               = "ami-09278528675a8d54e"
-  instance_type     = "t3.micro"
-  key_name          = "private_key"
-  security_groups   = [aws_security_group.sg.name]
+  ami                    = "ami-09278528675a8d54e"
+  instance_type          = "t3.micro"
+  key_name               = "private_key"
+  vpc_security_group_ids = [aws_security_group.sg.id]
 
-  provisioner "remote-exec" {
-    inline = [
-      "sudo yum update -y",
-      "sudo yum install -y docker",
-      "sudo systemctl start docker",
-      "sudo systemctl enable docker",
-      "sudo usermod -aG docker ec2-user",
-      "newgrp docker",
-      "sudo docker pull ${var.docker_image}",
-      "sudo docker run -d -p 80:80 ${var.docker_image}"
-    ]
-
-    connection {
-      type        = "ssh"
-      user        = "ec2-user"  
-      private_key = file(var.private_key_path)
-      host        = self.public_ip
-      timeout     = "10m"
-    }
-  }
-
+  user_data = <<-EOF
+              #!/bin/bash
+              yum update -y
+              yum install -y docker
+              systemctl start docker
+              systemctl enable docker
+              usermod -aG docker ec2-user
+              docker pull ${docker_image}
+              docker run -d -p 80:80 ${docker_image}
+              EOF
 
   tags = {
     Name = "Flask-Todo-App"
