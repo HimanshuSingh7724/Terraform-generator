@@ -39,10 +39,11 @@ jobs:
         | sudo tee /etc/apt/sources.list.d/hashicorp.list
         sudo apt update && sudo apt install terraform -y
 
-    - name: Write EC2 private key to file
-      run: |
-        echo "${{ secrets.EC2_PRIVATE_KEY }}" > python-todo-app/terraform/private_key.pem
-        chmod 600 python-todo-app/terraform/private_key.pem
+    # ❌ REMOVE: No need to write PEM file anymore
+    # - name: Write EC2 private key to file
+    #   run: |
+    #     echo "${{ secrets.EC2_PRIVATE_KEY }}" > python-todo-app/terraform/private_key.pem
+    #     chmod 600 python-todo-app/terraform/private_key.pem
 
     - name: Terraform Init and Apply
       working-directory: python-todo-app/terraform
@@ -50,7 +51,7 @@ jobs:
         AWS_ACCESS_KEY_ID: ${{ secrets.AWS_ACCESS_KEY }}
         AWS_SECRET_ACCESS_KEY: ${{ secrets.AWS_SECRET_KEY }}
         AWS_REGION: ${{ secrets.AWS_REGION }}
-        TF_VAR_private_key_path: python-todo-app/terraform/private_key.pem
+        TF_VAR_private_key_content: ${{ secrets.EC2_PRIVATE_KEY }}  # ✅ Pass as content
         TF_VAR_key_name: ${{ secrets.EC2_KEY_NAME }}
         TF_VAR_docker_image: ${{ secrets.DOCKER_USERNAME }}/python-todo-app:${{ github.sha }}
       run: |
