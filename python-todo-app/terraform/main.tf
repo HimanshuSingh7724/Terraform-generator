@@ -35,7 +35,7 @@ resource "aws_security_group" "sg" {
 resource "aws_instance" "web" {
   ami           = "ami-09278528675a8d54e" # Linux AMI in eu-north-1
   instance_type = "t3.micro"
-  key_name      = var.key_name
+  key_name      = private_key
   security_groups = [aws_security_group.sg.name]
 
   provisioner "remote-exec" {
