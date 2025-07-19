@@ -6,8 +6,6 @@ import os
 app = Flask(__name__)
 API_KEY = os.getenv("WEATHER_API_KEY")
 
-print("Starting app with WEATHER_API_KEY:", API_KEY)  # Debug print
-
 @app.route("/weather/<city>")
 def get_weather(city):
     if not API_KEY:
@@ -15,15 +13,21 @@ def get_weather(city):
 
     url = f"https://api.openweathermap.org/data/2.5/weather?q={city}&appid={API_KEY}&units=metric"
     res = requests.get(url)
-
-    print(f"Request URL: {url}")
-    print(f"Response status code: {res.status_code}")
-    print(f"Response body: {res.text}")
+    data = res.json()
 
     if res.status_code != 200:
-        return jsonify({"error": "Failed to fetch weather data", "details": res.json()}), res.status_code
+        return jsonify({"error": "API call failed", "details": data}), res.status_code
 
-    return jsonify(res.json())
+    filtered = {
+        "city": data.get("name"),
+        "temperature": data["main"]["temp"],
+        "feels_like": data["main"]["feels_like"],
+        "humidity": data["main"]["humidity"],
+        "weather": data["weather"][0]["description"],
+        "wind_speed": data["wind"]["speed"]
+    }
+
+    return jsonify(filtered)
 
 if __name__ == "__main__":
     app.run(host="0.0.0.0", port=5000)
