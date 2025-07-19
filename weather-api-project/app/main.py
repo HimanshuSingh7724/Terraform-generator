@@ -6,7 +6,7 @@ import os
 app = Flask(__name__)
 API_KEY = os.getenv("WEATHER_API_KEY")
 
-@app.route("/weather/<city>")
+@app.route("/weather/<city>") 
 def get_weather(city):
     if not API_KEY:
         return jsonify({"error": "API key not set"}), 500
