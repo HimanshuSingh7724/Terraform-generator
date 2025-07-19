@@ -22,6 +22,11 @@ jobs:
         docker tag weather-app ${{ secrets.DOCKER_USERNAME }}/weather-app
         docker push ${{ secrets.DOCKER_USERNAME }}/weather-app
 
+    - name: Install Terraform
+      uses: hashicorp/setup-terraform@v3
+      with:
+        terraform_version: 1.5.7 # Ya latest supported version
+
     - name: Terraform Deploy
       run: |
         cd weather-api-project/terraform
