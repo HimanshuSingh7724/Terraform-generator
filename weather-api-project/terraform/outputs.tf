@@ -3,7 +3,4 @@ output "instance_public_ip" {
   value       = aws_instance.web.public_ip
 }
 
-output "app_url" {
-  description = "Complete URL to access the deployed app"
-  value       = "http://${aws_instance.web.public_ip}/weather/Delhi"
-}
+
