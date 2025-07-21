@@ -36,4 +36,5 @@ jobs:
         AWS_ACCESS_KEY_ID: ${{ secrets.AWS_ACCESS_KEY }}
         AWS_SECRET_ACCESS_KEY: ${{ secrets.AWS_SECRET_KEY }}
         TF_VAR_weather_api_key: ${{ secrets.WEATHER_API_KEY }}
-        TF_VAR_my_key: ${{ secrets.MY_KEY }}  # ✅ Add this secret in GitHub
+        TF_VAR_my_key: ${{ secrets.MY_KEY }}
+        TF_VAR_docker_image: ${{ secrets.DOCKER_USERNAME }}/weather-app  # ✅ new variable for docker image
