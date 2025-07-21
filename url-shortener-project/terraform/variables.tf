@@ -3,6 +3,7 @@ variable "docker_image" {
   type        = string
 }
 
+ 
 variable "my_key" {
   description = "EC2 Key Pair Name"
   type        = string
