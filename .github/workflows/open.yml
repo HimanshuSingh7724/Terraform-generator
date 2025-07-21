@@ -11,7 +11,7 @@ jobs:
       - name: 📥 Checkout Repository
         uses: actions/checkout@v3
 
-      - name: 🔍 Debug - List all repo files
+      - name: 🔍 Debug - List All Files (ensure paths are correct)
         run: ls -R url-shortener-project
 
       - name: 🔐 Login to Docker Hub
