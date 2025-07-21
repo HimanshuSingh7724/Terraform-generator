@@ -6,7 +6,7 @@ provider "aws" {
 resource "aws_instance" "web" {
   ami           = "ami-0c55b159cbfafe1f0" # Amazon Linux 2
   instance_type = "t2.micro"
-  key_name      = var.key_name
+  key_name      = var.my_key
 
   user_data = <<-EOF
               #!/bin/bash
