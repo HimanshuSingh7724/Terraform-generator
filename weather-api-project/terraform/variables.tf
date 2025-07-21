@@ -1,11 +1,14 @@
 variable "my_key" {
-  description = "Name of the EC2 key pair to use"
+  description = "Name of the existing EC2 Key Pair to use for SSH access"
   type        = string
 }
 
-
 variable "weather_api_key" {
-  description = "API key for OpenWeatherMap"
+  description = "API key for the weather app"
   type        = string
-  sensitive   = true
+}
+
+variable "docker_image" {
+  description = "Full Docker Hub image name (e.g. username/weather-app)"
+  type        = string
 }
