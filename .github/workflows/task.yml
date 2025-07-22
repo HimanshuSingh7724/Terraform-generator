@@ -40,7 +40,7 @@ jobs:
         env:
           AWS_ACCESS_KEY_ID: ${{ secrets.AWS_ACCESS_KEY }}
           AWS_SECRET_ACCESS_KEY: ${{ secrets.AWS_SECRET_KEY }}
-          AWS_REGION: ${{ secrets.AWS_REGION }}
+          AWS_REGION: eu-north-1
         run: terraform apply -auto-approve
 
       - name: Build Docker image
@@ -49,15 +49,11 @@ jobs:
 
       - name: Login to AWS ECR
         uses: aws-actions/amazon-ecr-login@v2
-        env:
-          AWS_ACCESS_KEY_ID: ${{ secrets.AWS_ACCESS_KEY }}
-          AWS_SECRET_ACCESS_KEY: ${{ secrets.AWS_SECRET_KEY }}
-          AWS_REGION: eu-north-1
 
       - name: Tag and Push Docker image to ECR
         run: |
-          docker tag task-manager-backend:latest ${{ secrets.AWS_ACCOUNT_ID }}.dkr.ecr.eu-north-1.amazonaws.com/task-manager-backend:latest
-          docker push ${{ secrets.AWS_ACCOUNT_ID }}.dkr.ecr.eu-north-1.amazonaws.com/task-manager-backend:latest
+          docker tag task-manager-backend:latest 291741702080.dkr.ecr.eu-north-1.amazonaws.com/task-manager-backend:latest
+          docker push 291741702080.dkr.ecr.eu-north-1.amazonaws.com/task-manager-backend:latest
 
       - name: Deploy to ECS or EC2
         run: echo "Add ECS deployment commands here or restart container"
