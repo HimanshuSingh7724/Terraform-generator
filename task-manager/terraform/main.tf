@@ -4,7 +4,10 @@ provider "aws" {
 
 resource "aws_db_subnet_group" "db_subnet_group" {
   name       = "taskdb-subnet-group"
-  subnet_ids = var.db_subnet_ids  # Yeh list aapko .tfvars me deni hai
+  subnet_ids = [
+    "subnet-06b6e297f3ea72507", # eu-north-1b
+    "subnet-0d10d910fb4068c13"  # eu-north-1c
+  ]
 
   tags = {
     Name = "taskdb-subnet-group"
@@ -21,7 +24,6 @@ resource "aws_db_instance" "postgres" {
   password             = var.db_password
   skip_final_snapshot  = true
   publicly_accessible  = true
-
   db_subnet_group_name = aws_db_subnet_group.db_subnet_group.name
 }
 
