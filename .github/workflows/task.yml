@@ -1,4 +1,4 @@
-name: CI/CD Pipeline
+name: Pipeline
 
 on:
   push:
@@ -18,9 +18,10 @@ jobs:
           python-version: '3.9'
 
       - name: Install dependencies
+        working-directory: ./task-manager/backend
         run: |
           python -m pip install --upgrade pip
-          pip install -r backend/requirements.txt
+          pip install -r requirements.txt
 
       - name: Run tests (if any)
         run: echo "Add your test commands here"
@@ -37,12 +38,13 @@ jobs:
       - name: Terraform Apply
         working-directory: ./task-manager/terraform
         env:
-          AAWS_ACCESS_KEY: ${{ secrets.AWS_ACCESS_KEY }}
+          AWS_ACCESS_KEY: ${{ secrets.AWS_ACCESS_KEY }}
           AWS_SECRET_KEY: ${{ secrets.AWS_SECRET_KEY }}
         run: terraform apply -auto-approve
 
       - name: Build Docker image
-        run: docker build -t task-manager-backend ./backend
+        working-directory: ./task-manager/backend
+        run: docker build -t task-manager-backend .
 
       - name: Login to AWS ECR
         uses: aws-actions/amazon-ecr-login@v2
