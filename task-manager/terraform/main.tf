@@ -7,7 +7,7 @@ resource "aws_db_instance" "postgres" {
   engine               = "postgres"
   engine_version       = "13"
   instance_class       = "db.t3.micro"
-  name                 = var.db_name
+  identifier           = var.db_name          # <-- yahan name ki jagah identifier use kiya
   username             = var.db_user
   password             = var.db_password
   skip_final_snapshot  = true
