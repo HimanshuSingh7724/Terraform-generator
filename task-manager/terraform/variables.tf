@@ -1,15 +1,25 @@
 variable "aws_region" {
-  default = "us-east-1"
+  description = "AWS region"
+  type        = string
 }
 
 variable "db_name" {
-  default = "taskdb"
+  description = "Database name"
+  type        = string
 }
 
 variable "db_user" {
-  default = "postgres"
+  description = "Database username"
+  type        = string
 }
 
 variable "db_password" {
-  default = "your_password_here"
+  description = "Database password"
+  type        = string
+  sensitive   = true
+}
+
+variable "db_subnet_ids" {
+  description = "List of subnet IDs in at least 2 different AZs"
+  type        = list(string)
 }
