@@ -50,12 +50,12 @@ jobs:
       - name: Login to AWS ECR
         uses: aws-actions/amazon-ecr-login@v2
         with:
-          region: ${{ secrets.AWS_REGION }}
+          region: eu-north-1
 
       - name: Tag and Push Docker image to ECR
         run: |
-          docker tag task-manager-backend:latest ${{ secrets.AWS_ACCOUNT_ID }}.dkr.ecr.${{ secrets.AWS_REGION }}.amazonaws.com/task-manager-backend:latest
-          docker push ${{ secrets.AWS_ACCOUNT_ID }}.dkr.ecr.${{ secrets.AWS_REGION }}.amazonaws.com/task-manager-backend:latest
+          docker tag task-manager-backend:latest ${{ secrets.AWS_ACCOUNT_ID }}.dkr.ecr.eu-north-1.amazonaws.com/task-manager-backend:latest
+          docker push ${{ secrets.AWS_ACCOUNT_ID }}.dkr.ecr.eu-north-1.amazonaws.com/task-manager-backend:latest
 
       - name: Deploy to ECS or EC2
         run: echo "Add ECS deployment commands here or restart container"
