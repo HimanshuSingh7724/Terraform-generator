@@ -13,7 +13,6 @@
       "portMappings": [
         {
           "containerPort": 80,
-          "hostPort": 80,
           "protocol": "tcp"
         }
       ],
@@ -23,8 +22,16 @@
           "value": "<RDS_ENDPOINT>"
         },
         {
+          "name": "DB_PASSWORD",
+          "value": "<DB_PASSWORD>"
+        },
+        {
           "name": "S3_BUCKET",
           "value": "<BUCKET_NAME>"
+        },
+        {
+          "name": "AWS_REGION",
+          "value": "eu-north-1"
         }
       ]
     }

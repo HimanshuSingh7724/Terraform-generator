@@ -46,7 +46,7 @@ data "aws_iam_role" "ecs_task_execution_role" {
   name = "ecsTaskExecutionRole"
 }
 
-# ✅ ECS Task Definition
+# ✅ ECS Task Definition with ENV VARS
 resource "aws_ecs_task_definition" "task" {
   family                   = "ai-notes-app-task"
   network_mode             = "awsvpc"
@@ -66,6 +66,24 @@ resource "aws_ecs_task_definition" "task" {
       hostPort      = 80
       protocol      = "tcp"
     }]
+    environment = [
+      {
+        name  = "DB_HOST"
+        value = aws_db_instance.postgres_db.endpoint
+      },
+      {
+        name  = "DB_PASSWORD"
+        value = var.db_password
+      },
+      {
+        name  = "S3_BUCKET"
+        value = aws_s3_bucket.voice_bucket.bucket
+      },
+      {
+        name  = "AWS_REGION"
+        value = "eu-north-1"
+      }
+    ]
   }])
 }
 
@@ -78,8 +96,8 @@ resource "aws_ecs_service" "service" {
   launch_type     = "FARGATE"
 
   network_configuration {
-    subnets          = ["subnet-024aa601a4696585c"]      # ✅ Tumhara actual Subnet ID
-    security_groups  = ["sg-03865f37baee2fd4b"]          # ✅ Tumhara Security Group ID
+    subnets          = ["subnet-024aa601a4696585c"]   # ✅ Tumhara subnet
+    security_groups  = ["sg-03865f37baee2fd4b"]       # ✅ Tumhara SG
     assign_public_ip = true
   }
 

@@ -2,35 +2,46 @@ from fastapi import FastAPI, UploadFile, File
 import boto3
 import uuid
 import psycopg2
+import os  # ✅ Environment vars ke liye
 from transcribe_utils import start_transcription_job, get_transcription_text
 
 app = FastAPI()
 
-# AWS clients with region
-s3_client = boto3.client('s3', region_name='eu-north-1')
-transcribe_client = boto3.client('transcribe', region_name='eu-north-1')
+# ✅ AWS region fix
+AWS_REGION = 'eu-north-1'
 
-# Database connection details (use env vars in prod!)
+# ✅ Get env vars
+RDS_ENDPOINT = os.getenv("DB_HOST")
+RDS_PASSWORD = os.getenv("DB_PASSWORD")
+S3_BUCKET = os.getenv("S3_BUCKET")
+
+# ✅ AWS Clients
+s3_client = boto3.client('s3', region_name=AWS_REGION)
+transcribe_client = boto3.client('transcribe', region_name=AWS_REGION)
+
+# ✅ DB Connection
 db_conn = psycopg2.connect(
-    host="YOUR_RDS_ENDPOINT",
+    host=RDS_ENDPOINT,
     database="notesdb",
     user="postgres",
-    password="YOUR_PASSWORD"
+    password=RDS_PASSWORD
 )
 db_cursor = db_conn.cursor()
 
-S3_BUCKET = 'your-s3-bucket'
 
 @app.post("/upload")
 async def upload_audio(file: UploadFile = File(...)):
     file_id = str(uuid.uuid4())
     s3_key = f"audio/{file_id}.wav"
 
+    # ✅ Upload to S3
     s3_client.upload_fileobj(file.file, S3_BUCKET, s3_key)
 
+    # ✅ Start transcription job
     start_transcription_job(file_id, s3_key)
 
     return {"message": "Uploaded and transcription started", "file_id": file_id}
+
 
 @app.get("/transcription/{file_id}")
 def get_transcription(file_id: str):
@@ -45,6 +56,7 @@ def get_transcription(file_id: str):
         return {"text": text}
     else:
         return {"message": "Transcription not ready"}
+
 
 @app.get("/search")
 def search_notes(q: str):
