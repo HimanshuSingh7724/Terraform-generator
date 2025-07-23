@@ -2,9 +2,14 @@ provider "aws" {
   region = "eu-north-1" # ✅ Aapka AWS region
 }
 
-# ✅ S3 bucket
+# ✅ Random ID generator for unique bucket name
+resource "random_id" "bucket_id" {
+  byte_length = 4
+}
+
+# ✅ S3 bucket with unique name
 resource "aws_s3_bucket" "voice_bucket" {
-  bucket = "your-s3-bucket"
+  bucket = "voice-bucket-${random_id.bucket_id.hex}"
 }
 
 # ✅ Variable for DB password
@@ -44,4 +49,8 @@ output "ecr_repo_url" {
 
 output "rds_endpoint" {
   value = aws_db_instance.postgres_db.endpoint
+}
+
+output "bucket_name" {
+  value = aws_s3_bucket.voice_bucket.bucket
 }
