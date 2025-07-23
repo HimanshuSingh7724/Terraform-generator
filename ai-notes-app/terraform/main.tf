@@ -10,6 +10,8 @@ resource "aws_s3_bucket" "voice_bucket" {
 # ✅ Variable for DB password
 variable "db_password" {
   description = "The RDS database password"
+  type        = string
+  sensitive   = true
 }
 
 # ✅ RDS instance
