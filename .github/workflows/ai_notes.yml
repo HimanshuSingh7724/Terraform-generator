@@ -30,18 +30,26 @@ jobs:
         working-directory: ./ai-notes-app/terraform
         run: terraform apply -auto-approve
 
-      # ✅ Get ECS Task Definition ARN from Terraform Output
       - name: Get Terraform Outputs
         id: tf_outputs
         working-directory: ./ai-notes-app/terraform
         run: |
-          echo "ECS_TASK_DEF_ARN=$(terraform output -raw ecs_task_definition_arn)" >> $GITHUB_ENV
+          echo "ECR_REPO_URL=$(terraform output -raw ecr_repo_url)" >> $GITHUB_ENV
+          echo "RDS_ENDPOINT=$(terraform output -raw rds_endpoint)" >> $GITHUB_ENV
+          echo "BUCKET_NAME=$(terraform output -raw bucket_name)" >> $GITHUB_ENV
+          echo "EXECUTION_ROLE_ARN=$(terraform output -raw ecs_task_execution_role_arn)" >> $GITHUB_ENV
+
+      - name: Replace placeholders in ecs-task-def.json
+        run: |
+          sed -i "s|<ECR_REPO_URL>|${{ env.ECR_REPO_URL }}|" ecs-task-def.json
+          sed -i "s|<RDS_ENDPOINT>|${{ env.RDS_ENDPOINT }}|" ecs-task-def.json
+          sed -i "s|<BUCKET_NAME>|${{ env.BUCKET_NAME }}|" ecs-task-def.json
+          sed -i "s|<EXECUTION_ROLE_ARN>|${{ env.EXECUTION_ROLE_ARN }}|" ecs-task-def.json
 
       - name: Set up Docker Buildx
         uses: docker/setup-buildx-action@v3
 
       - name: Login to ECR
-        id: login-ecr
         uses: aws-actions/amazon-ecr-login@v2
 
       - name: Build and push Docker image
@@ -50,13 +58,13 @@ jobs:
           ECR_REPOSITORY: ai-notes-app
           IMAGE_TAG: ${{ github.sha }}
         run: |
-          docker build -t $ECR_REGISTRY/$ECR_REPOSITORY:$IMAGE_TAG -f ai-notes-app/Dockerfile ai-notes-app
-          docker push $ECR_REGISTRY/$ECR_REPOSITORY:$IMAGE_TAG
+          docker build -t $ECR_REGISTRY/$ECR_REPOSITORY:latest -f ai-notes-app/Dockerfile ai-notes-app
+          docker push $ECR_REGISTRY/$ECR_REPOSITORY:latest
 
       - name: Deploy to ECS
         uses: aws-actions/amazon-ecs-deploy-task-definition@v1
         with:
-          task-definition: ${{ env.ECS_TASK_DEF_ARN }}  # ✅ FILE NAHI, DIRECT ARN
+          task-definition: ecs-task-def.json
           cluster: ai-notes-cluster
           service: ai-notes-app-service
           wait-for-service-stability: true
