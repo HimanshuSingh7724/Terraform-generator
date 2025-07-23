@@ -45,6 +45,7 @@ jobs:
           sed -i "s|<RDS_ENDPOINT>|${{ env.RDS_ENDPOINT }}|" ai-notes-app/ecs-task-def.json
           sed -i "s|<BUCKET_NAME>|${{ env.BUCKET_NAME }}|" ai-notes-app/ecs-task-def.json
           sed -i "s|<EXECUTION_ROLE_ARN>|${{ env.EXECUTION_ROLE_ARN }}|" ai-notes-app/ecs-task-def.json
+          sed -i "s|<DB_PASSWORD>|${{ secrets.DB_PASSWORD }}|" ai-notes-app/ecs-task-def.json
 
       - name: Debug - Show updated task definition
         run: cat ai-notes-app/ecs-task-def.json
@@ -67,7 +68,7 @@ jobs:
       - name: Deploy to ECS
         uses: aws-actions/amazon-ecs-deploy-task-definition@v1
         with:
-          task-definition: ai-notes-app/ecs-task-def.json  # ✅ CORRECT PATH!
+          task-definition: ai-notes-app/ecs-task-def.json
           cluster: ai-notes-cluster
           service: ai-notes-app-service
           wait-for-service-stability: true
