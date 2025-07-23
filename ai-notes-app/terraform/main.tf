@@ -4,7 +4,7 @@ provider "aws" {
 
 # ✅ Random ID generator for unique bucket name
 resource "random_id" "bucket_id" {
-  byte_length = 4
+  byte_length = 4  
 }
 
 # ✅ S3 bucket with unique name
