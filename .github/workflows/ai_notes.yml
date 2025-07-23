@@ -30,7 +30,7 @@ jobs:
         working-directory: ./ai-notes-app/terraform
         run: terraform apply -auto-approve
 
-      # ✅ Terraform Output: Task Definition ARN
+      # ✅ Get ECS Task Definition ARN from Terraform Output
       - name: Get Terraform Outputs
         id: tf_outputs
         working-directory: ./ai-notes-app/terraform
@@ -56,7 +56,7 @@ jobs:
       - name: Deploy to ECS
         uses: aws-actions/amazon-ecs-deploy-task-definition@v1
         with:
-          task-definition: ${{ env.ECS_TASK_DEF_ARN }}  # ✅ FILE NAHI, ARN USE HO RAHA HAI
+          task-definition: ${{ env.ECS_TASK_DEF_ARN }}  # ✅ FILE NAHI, DIRECT ARN
           cluster: ai-notes-cluster
           service: ai-notes-app-service
           wait-for-service-stability: true
