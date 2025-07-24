@@ -1,0 +1,21 @@
+{
+  "family": "board-game-task",
+  "networkMode": "awsvpc",
+  "requiresCompatibilities": ["FARGATE"],
+  "cpu": "256",
+  "memory": "512",
+  "executionRoleArn": "<EXECUTION_ROLE_ARN>",
+  "containerDefinitions": [
+    {
+      "name": "board-game-app",
+      "image": "<ECR_REPO_URL>:latest",
+      "essential": true,
+      "portMappings": [
+        {
+          "containerPort": 80,
+          "hostPort": 80
+        }
+      ]
+    }
+  ]
+}
