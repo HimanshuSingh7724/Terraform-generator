@@ -1,0 +1,35 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Tic Tac Toe</title>
+    <style>
+        table { margin: auto; border-collapse: collapse; }
+        td { width: 60px; height: 60px; text-align: center; font-size: 32px; border: 1px solid #333; }
+        a { display: block; text-decoration: none; color: black; }
+    </style>
+</head>
+<body>
+    <h1 align="center">Tic Tac Toe (No JS)</h1>
+
+    <table>
+        {% for i in range(3) %}
+        <tr>
+            {% for j in range(3) %}
+            <td>
+                {% if board[i][j] == "" and not winner %}
+                    <a href="/move/{{ i }}/{{ j }}">_</a>
+                {% else %}
+                    {{ board[i][j] or "_" }}
+                {% endif %}
+            </td>
+            {% endfor %}
+        </tr>
+        {% endfor %}
+    </table>
+
+    {% if winner %}
+        <h2 align="center">{{ winner }} wins!</h2>
+        <div align="center"><a href="/reset">Play Again</a></div>
+    {% endif %}
+</body>
+</html>
