@@ -14,14 +14,14 @@ resource "aws_security_group" "tic_tac_toe_sg" {
     from_port   = 22
     to_port     = 22
     protocol    = "tcp"
-    cidr_blocks = ["0.0.0.0/0"]  # For SSH access
+    cidr_blocks = ["0.0.0.0/0"]  # SSH access
   }
 
   ingress {
     from_port   = 80
     to_port     = 80
     protocol    = "tcp"
-    cidr_blocks = ["0.0.0.0/0"]  # For browser access
+    cidr_blocks = ["0.0.0.0/0"]  # HTTP access
   }
 
   egress {
@@ -33,9 +33,9 @@ resource "aws_security_group" "tic_tac_toe_sg" {
 }
 
 resource "aws_instance" "tic_tac_toe" {
-  ami           = "ami-09278528675a8d54e" # Amazon Linux 2 (eu-north-1)
-  instance_type = "t3.micro"
-  key_name      = var.key_name
+  ami             = "ami-09278528675a8d54e" # Amazon Linux 2 (eu-north-1)
+  instance_type   = "t3.micro"
+  key_name        = var.key_name
   security_groups = [aws_security_group.tic_tac_toe_sg.name]
 
   user_data = <<-EOF
@@ -51,6 +51,7 @@ resource "aws_instance" "tic_tac_toe" {
   }
 }
 
-output "public_ip" {
+# ✅ Correct output name for GitHub Actions
+output "ec2_public_ip" {
   value = aws_instance.tic_tac_toe.public_ip
 }
