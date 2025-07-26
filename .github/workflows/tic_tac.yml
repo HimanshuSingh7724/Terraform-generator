@@ -2,8 +2,9 @@ name: Deploy Tic Tac Toe
 
 on:
   push:
+    paths:
+      - 'tic-tac-toe-project/**'
     branches: [ main ]
-    
 
 jobs:
   deploy:
@@ -28,6 +29,12 @@ jobs:
         terraform init
         terraform apply -auto-approve -var="key_name=my_key"
 
+    - name: Get EC2 Public IP from Terraform Output
+      id: get_ip
+      working-directory: ./tic-tac-toe-project/terraform
+      run: |
+        echo "EC2_IP=$(terraform output -raw ec2_public_ip)" >> $GITHUB_OUTPUT
+
     - name: Build and Push Docker image
       working-directory: ./tic-tac-toe-project
       run: |
@@ -38,9 +45,9 @@ jobs:
     - name: Deploy to EC2 via SSH
       uses: appleboy/ssh-action@master
       with:
-        host: ${{ secrets.EC2_HOST }}
+        host: ${{ steps.get_ip.outputs.EC2_IP }}
         username: ec2-user
-        key: ${{ secrets.EC2_PRIVATE_KEY }}
+        key: ${{ secrets.MY_KEY }}
         script: |
           docker pull ${{ secrets.DOCKER_USERNAME }}/tictactoe:latest
           docker stop $(docker ps -q) || true
