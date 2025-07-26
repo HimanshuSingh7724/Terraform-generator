@@ -3,7 +3,7 @@ provider "aws" {
 }
 
 variable "key_name" {
-  default = "my_key"
+  default = "my_key"   
 }
 
 resource "aws_security_group" "tic_tac_toe_sg" {
