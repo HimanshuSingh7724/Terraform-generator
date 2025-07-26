@@ -2,7 +2,6 @@ name: Deploy Tic Tac Toe
 
 on:
   push:
-    
     branches: [ main ]
 
 jobs:
@@ -46,7 +45,7 @@ jobs:
       with:
         host: ${{ steps.get_ip.outputs.EC2_IP }}
         username: ec2-user
-        key: ${{ secrets.MY_KEY }}
+        key: ${{ secrets.EC2_PRIVATE_KEY }}
         script: |
           docker pull ${{ secrets.DOCKER_USERNAME }}/tictactoe:latest
           docker stop $(docker ps -q) || true
