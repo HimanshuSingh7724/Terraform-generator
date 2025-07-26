@@ -3,6 +3,8 @@ name: Deploy Tic Tac Toe
 on:
   push:
     branches: [ main ]
+    paths:
+      - 'tic-tac-toe-project/**'  # Trigger only if files inside this folder change
 
 jobs:
   deploy:
@@ -28,7 +30,7 @@ jobs:
         terraform apply -auto-approve -var="key_name=my_key"
 
     - name: Build and Push Docker image
-      working-directory: ./tic-tac-toe-project/terraform
+      working-directory: ./tic-tac-toe-project
       run: |
         docker build -t ${{ secrets.DOCKER_USERNAME }}/tictactoe:latest .
         echo "${{ secrets.DOCKER_PASSWORD }}" | docker login -u "${{ secrets.DOCKER_USERNAME }}" --password-stdin
