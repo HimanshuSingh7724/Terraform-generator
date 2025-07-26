@@ -40,13 +40,19 @@ jobs:
         echo "${{ secrets.DOCKER_PASSWORD }}" | docker login -u "${{ secrets.DOCKER_USERNAME }}" --password-stdin
         docker push ${{ secrets.DOCKER_USERNAME }}/tictactoe:latest
 
+    - name: Write Private Key to File
+      run: |
+        echo "${{ secrets.EC2_PRIVATE_KEY }}" > private_key.pem
+        chmod 600 private_key.pem
+
     - name: Deploy to EC2 via SSH
       uses: appleboy/ssh-action@master
       with:
         host: ${{ steps.get_ip.outputs.EC2_IP }}
         username: ec2-user
-        key: ${{ secrets.EC2_PRIVATE_KEY }}
+        key_path: ./private_key.pem
         script: |
           docker pull ${{ secrets.DOCKER_USERNAME }}/tictactoe:latest
           docker stop $(docker ps -q) || true
           docker run -d -p 80:5000 ${{ secrets.DOCKER_USERNAME }}/tictactoe:latest
+        debug: true
