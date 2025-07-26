@@ -2,8 +2,7 @@ name: Deploy Tic Tac Toe
 
 on:
   push:
-    paths:
-      - 'tic-tac-toe-project/**'
+    
     branches: [ main ]
 
 jobs:
