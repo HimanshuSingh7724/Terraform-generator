@@ -52,20 +52,16 @@ jobs:
         username: ec2-user
         key_path: ./private_key.pem
         script: |
-          # Ensure Docker is installed (in case user_data failed)
-          if ! command -v docker &> /dev/null
-          then
-              echo "Docker not found, installing..."
-              sudo yum update -y
-              sudo amazon-linux-extras enable docker
-              sudo yum install -y docker
-              sudo systemctl start docker
-              sudo systemctl enable docker
-              sudo usermod -aG docker ec2-user
-          fi
+          # Install Docker for Amazon Linux 2023
+          sudo dnf install -y docker
+          sudo systemctl start docker
+          sudo systemctl enable docker
+          sudo usermod -aG docker ec2-user
 
-          # Docker deployment
-          docker pull ${{ secrets.DOCKER_USERNAME }}/tictactoe:latest
-          docker stop $(docker ps -q) || true
-          docker run -d -p 80:5000 ${{ secrets.DOCKER_USERNAME }}/tictactoe:latest
+          # Restart SSH session to apply group change (alternative: run as sudo)
+          newgrp docker <<EONG
+            docker pull ${{ secrets.DOCKER_USERNAME }}/tictactoe:latest
+            docker stop $(docker ps -q) || true
+            docker run -d -p 80:5000 ${{ secrets.DOCKER_USERNAME }}/tictactoe:latest
+          EONG
         debug: true
