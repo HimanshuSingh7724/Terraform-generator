@@ -42,7 +42,10 @@ resource "aws_instance" "tic_tac_toe" {
               #!/bin/bash
               yum update -y
               amazon-linux-extras install docker -y
-              service docker start
+              systemctl start docker
+              systemctl enable docker
+              usermod -aG docker ec2-user
+              docker pull himanshu/tictactoe:latest
               docker run -d -p 80:5000 himanshu/tictactoe:latest
               EOF
 
@@ -51,7 +54,6 @@ resource "aws_instance" "tic_tac_toe" {
   }
 }
 
-# ✅ Correct output name for GitHub Actions
 output "ec2_public_ip" {
   value = aws_instance.tic_tac_toe.public_ip
 }
