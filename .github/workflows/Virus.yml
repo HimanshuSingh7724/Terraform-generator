@@ -1,0 +1,62 @@
+name: Deploy Virus Scanner Project
+
+on:
+  push:
+    branches:
+      - main
+
+jobs:
+  deploy:
+    name: Build & Deploy to AWS
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v3
+
+      - name: Set up Python
+        uses: actions/setup-python@v4
+        with:
+          python-version: '3.9'
+
+      - name: Install Terraform
+        uses: hashicorp/setup-terraform@v3
+        with:
+          terraform_version: 1.5.0
+
+      - name: Set up Docker Buildx
+        uses: docker/setup-buildx-action@v3
+
+      - name: Configure AWS credentials
+        uses: aws-actions/configure-aws-credentials@v2
+        with:
+          aws-access-key-id: ${{ secrets.AWS_ACCESS_KEY }}
+          aws-secret-access-key: ${{ secrets.AWS_SECRET_KEY }}
+          aws-region: ${{ secrets.AWS_REGION }}
+
+      - name: Build Docker image
+        working-directory: Terraform-Generator/VirusScanner-Project
+        run: docker build -t virus-scanner-app .
+
+      - name: Zip Lambda function
+        working-directory: Terraform-Generator/VirusScanner-Project/lambda
+        run: |
+          pip install -r requirements.txt -t python
+          cp lambda_function.py python/
+          cd python
+          zip -r ../lambda_archive.zip .
+          cd ..
+          mv lambda_archive.zip ../terraform/
+          rm -rf python
+
+      - name: Terraform Init
+        working-directory: Terraform-Generator/VirusScanner-Project/terraform
+        run: terraform init
+
+      - name: Terraform Plan
+        working-directory: Terraform-Generator/VirusScanner-Project/terraform
+        run: terraform plan
+
+      - name: Terraform Apply
+        working-directory: Terraform-Generator/VirusScanner-Project/terraform
+        run: terraform apply -auto-approve
