@@ -35,11 +35,11 @@ jobs:
           aws-region: ${{ secrets.AWS_REGION }}
 
       - name: Build Docker image
-        working-directory: VirusScanner-Project
+        working-directory: S3-VirusScanner-Project
         run: docker build -t virus-scanner-app .
 
       - name: Zip Lambda function
-        working-directory: VirusScanner-Project/lambda
+        working-directory: S3-VirusScanner-Project/lambda
         run: |
           pip install -r requirements.txt -t python
           cp lambda_function.py python/
@@ -50,13 +50,13 @@ jobs:
           rm -rf python
 
       - name: Terraform Init
-        working-directory: VirusScanner-Project/terraform
+        working-directory: S3-VirusScanner-Project/terraform
         run: terraform init
 
       - name: Terraform Plan
-        working-directory: VirusScanner-Project/terraform
+        working-directory: S3-VirusScanner-Project/terraform
         run: terraform plan
 
       - name: Terraform Apply
-        working-directory: VirusScanner-Project/terraform
+        working-directory: S3-VirusScanner-Project/terraform
         run: terraform apply -auto-approve
