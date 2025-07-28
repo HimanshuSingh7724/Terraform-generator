@@ -1,0 +1,31 @@
+# Python cache files
+__pycache__/
+*.pyc
+
+# Virtual environment folders
+venv/
+.env/
+
+# Flask uploads folder (if used)
+app/uploads/
+
+# Environment variable files
+.env
+
+# OS-specific
+.DS_Store
+Thumbs.db
+
+# Lambda deployment archive (auto-generated)
+terraform/lambda_archive.zip
+
+# Terraform state files
+*.tfstate
+*.tfstate.backup
+
+# VSCode/IDE config folders
+.vscode/
+.idea/
+
+# Log files (optional)
+*.log
