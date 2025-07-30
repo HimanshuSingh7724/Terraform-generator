@@ -1,0 +1,24 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>OCR Document Extractor</title>
+</head>
+<body>
+    <h2>Upload Document</h2>
+    <form action="/" method="post" enctype="multipart/form-data">
+        <input type="file" name="document" required>
+        <button type="submit">Upload</button>
+    </form>
+
+    {% if text %}
+        <h3>Extracted Text:</h3>
+        <p>{{ text }}</p>
+        <h3>Extracted Entities:</h3>
+        <ul>
+        {% for key, values in entities.items() %}
+            <li><strong>{{ key }}:</strong> {{ values }}</li>
+        {% endfor %}
+        </ul>
+    {% endif %}
+</body>
+</html>
