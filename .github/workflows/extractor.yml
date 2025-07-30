@@ -8,6 +8,9 @@ on:
 jobs:
   deploy:
     runs-on: ubuntu-latest
+    defaults:
+      run:
+        working-directory: ./OCR-Document-Extractor
 
     steps:
       - name: 📦 Checkout Repository
@@ -33,13 +36,13 @@ jobs:
         uses: hashicorp/setup-terraform@v2
 
       - name: 🧱 Terraform Init
-        working-directory: terraform
         run: terraform init
+        working-directory: ./OCR-Document-Extractor/terraform
 
       - name: 📋 Terraform Plan
-        working-directory: terraform
         run: terraform plan
+        working-directory: ./OCR-Document-Extractor/terraform
 
       - name: 🚀 Terraform Apply
-        working-directory: terraform
         run: terraform apply -auto-approve
+        working-directory: ./OCR-Document-Extractor/terraform
