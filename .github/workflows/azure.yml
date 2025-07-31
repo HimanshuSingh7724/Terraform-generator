@@ -1,7 +1,7 @@
 name: Deploy Azure
 
 on:
-  push:
+  push:  
     branches: [ main ]
 
 jobs:
