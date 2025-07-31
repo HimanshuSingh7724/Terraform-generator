@@ -1,63 +1,59 @@
-name: Deploy Azure
+name: Deploy Flask App to EC2
 
 on:
-  push:     
-    branches: [ main ]
+  push:
+    branches:
+      - main
 
 jobs:
   deploy:
     runs-on: ubuntu-latest
 
     steps:
-    - name: Checkout Code
-      uses: actions/checkout@v3
+      - name: Checkout Code
+        uses: actions/checkout@v3
 
-    - name: Setup Terraform
-      uses: hashicorp/setup-terraform@v3
-      with:
-        terraform_version: 1.8.0
+      - name: Set up Terraform
+        uses: hashicorp/setup-terraform@v2
+        with:
+          terraform_version: 1.5.0
 
-    - name: Terraform Init
-      working-directory: ./AzurePipelineMigrationTool/terraform
-      env:
-        AWS_ACCESS_KEY_ID: ${{ secrets.AWS_ACCESS_KEY }}
-        AWS_SECRET_ACCESS_KEY: ${{ secrets.AWS_SECRET_KEY }}
-        AWS_REGION: ${{ secrets.AWS_REGION }}
-      run: terraform init
+      - name: Initialize Terraform
+        working-directory: ./Terraform-Generator/AzurePipelineMigrationTool/terraform
+        run: terraform init
 
-    - name: Terraform Apply
-      working-directory: ./AzurePipelineMigrationTool/terraform
-      env:
-        AWS_ACCESS_KEY_ID: ${{ secrets.AWS_ACCESS_KEY }}
-        AWS_SECRET_ACCESS_KEY: ${{ secrets.AWS_SECRET_KEY }}
-        AWS_REGION: ${{ secrets.AWS_REGION }}
-      run: terraform apply -auto-approve
+      - name: Apply Terraform
+        working-directory: ./Terraform-Generator/AzurePipelineMigrationTool/terraform
+        run: terraform apply -auto-approve
 
-    - name: Get EC2 Public IP from Terraform output
-      id: get_ip
-      working-directory: ./AzurePipelineMigrationTool/terraform
-      run: |
-        PUBLIC_IP=$(terraform output -raw ec2_public_ip)
-        echo "EC2_PUBLIC_IP=$PUBLIC_IP" >> $GITHUB_ENV
+      - name: Get EC2 Public IP
+        id: terraform
+        working-directory: ./Terraform-Generator/AzurePipelineMigrationTool/terraform
+        run: |
+          echo "EC2_PUBLIC_IP=$(terraform output -raw ec2_public_ip)" >> $GITHUB_ENV
+          echo "::set-output name=ec2_public_ip::$(terraform output -raw ec2_public_ip)"
 
-    - name: Copy project files to EC2
-      uses: appleboy/scp-action@v0.1.4
-      with:
-        host: ${{ env.EC2_PUBLIC_IP }}
-        username: ec2-user
-        key: ${{ secrets.EC2_PRIVATE_KEY }}
-        source: "."
-        target: "~/AzurePipelineMigrationTool"
+      - name: Wait for EC2 to be ready
+        run: sleep 60
 
-    - name: SSH and run Docker on EC2
-      uses: appleboy/ssh-action@v1.0.0
-      with:
-        host: ${{ env.EC2_PUBLIC_IP }}
-        username: ec2-user
-        key: ${{ secrets.EC2_PRIVATE_KEY }}
-        script: |
-          cd AzurePipelineMigrationTool
-          docker build -t azure-pipeline-migrator .
-          docker stop azure-pipeline-migrator || true
-          docker rm azure-pipeline-migrator || true
-          docker run -d --name azure-pipeline-migrator -p 5000:5000 azure-pipeline-migrator
+      - name: Copy app to EC2
+        uses: appleboy/scp-action@v0.1.4
+        with:
+          host: ${{ steps.terraform.outputs.ec2_public_ip }}
+          username: ec2-user
+          key: ${{ secrets.EC2_SSH_KEY }}
+          source: "./Terraform-Generator/AzurePipelineMigrationTool"
+          target: "/home/ec2-user/"
+
+      - name: Deploy Docker app on EC2
+        uses: appleboy/ssh-action@v1.0.0
+        with:
+          host: ${{ steps.terraform.outputs.ec2_public_ip }}
+          username: ec2-user
+          key: ${{ secrets.EC2_SSH_KEY }}
+          script: |
+            cd /home/ec2-user/AzurePipelineMigrationTool
+            docker build -t azure-pipeline-migrator .
+            docker stop azure-pipeline-migrator || true
+            docker rm azure-pipeline-migrator || true
+            docker run -d --name azure-pipeline-migrator -p 5000:5000 azure-pipeline-migrator
