@@ -35,9 +35,9 @@ jobs:
         id: get_ip
         working-directory: ./AzurePipelineMigrationTool/terraform
         run: |
-          terraform output -raw ec2_public_ip > ip.txt
-          IP=$(cat ip.txt | tr -d '\r')
-          echo "EC2_PUBLIC_IP=$IP" >> $GITHUB_ENV
+          echo "Fetching EC2 IP..."
+          IP=$(terraform output -raw ec2_public_ip)
+          echo "EC2_PUBLIC_IP=${IP}" >> $GITHUB_ENV
 
       - name: Wait for EC2 to be ready
         run: sleep 60
