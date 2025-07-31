@@ -19,19 +19,18 @@ jobs:
           terraform_version: 1.5.0
 
       - name: Initialize Terraform
-        working-directory: ./Terraform-Generator/AzurePipelineMigrationTool/terraform
+        working-directory: ./AzurePipelineMigrationTool/terraform
         run: terraform init
 
       - name: Apply Terraform
-        working-directory: ./Terraform-Generator/AzurePipelineMigrationTool/terraform
+        working-directory: ./AzurePipelineMigrationTool/terraform
         run: terraform apply -auto-approve
 
       - name: Get EC2 Public IP
-        id: terraform
-        working-directory: ./Terraform-Generator/AzurePipelineMigrationTool/terraform
+        id: get_ip
+        working-directory: ./AzurePipelineMigrationTool/terraform
         run: |
           echo "EC2_PUBLIC_IP=$(terraform output -raw ec2_public_ip)" >> $GITHUB_ENV
-          echo "::set-output name=ec2_public_ip::$(terraform output -raw ec2_public_ip)"
 
       - name: Wait for EC2 to be ready
         run: sleep 60
@@ -39,16 +38,16 @@ jobs:
       - name: Copy app to EC2
         uses: appleboy/scp-action@v0.1.4
         with:
-          host: ${{ steps.terraform.outputs.ec2_public_ip }}
+          host: ${{ env.EC2_PUBLIC_IP }}
           username: ec2-user
           key: ${{ secrets.EC2_SSH_KEY }}
-          source: "./Terraform-Generator/AzurePipelineMigrationTool"
+          source: "./AzurePipelineMigrationTool"
           target: "/home/ec2-user/"
 
       - name: Deploy Docker app on EC2
         uses: appleboy/ssh-action@v1.0.0
         with:
-          host: ${{ steps.terraform.outputs.ec2_public_ip }}
+          host: ${{ env.EC2_PUBLIC_IP }}
           username: ec2-user
           key: ${{ secrets.EC2_SSH_KEY }}
           script: |
