@@ -3,8 +3,8 @@ provider "aws" {
 }
 
 resource "aws_instance" "app_server" {
-  ami           = "ami-0014ce3e52359afbd"
-  instance_type = "t2.micro"
+  ami           = "ami-09278528675a8d54e"
+  instance_type = "t3.micro"
   key_name      = "my_key"
 
   vpc_security_group_ids = [aws_security_group.allow_ssh_http.id]
