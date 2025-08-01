@@ -53,7 +53,7 @@ jobs:
           username: ec2-user
           key: ${{ secrets.EC2_PRIVATE_KEY }}
           source: "./AzurePipelineMigrationTool"
-          target: "/home/ec2-user/"
+          target: "/home/ec2-user/"  
 
       - name: Deploy Docker app on EC2
         uses: appleboy/ssh-action@v1.0.0
