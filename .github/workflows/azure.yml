@@ -36,14 +36,14 @@ jobs:
         working-directory: ./AzurePipelineMigrationTool/terraform
         run: |
           echo "Extracting EC2 IP..."
-          RAW_IP=$(terraform output ec2_public_ip | grep -Eo '([0-9]{1,3}\.){3}[0-9]{1,3}')
-          echo "::notice::EC2 Public IP is $RAW_IP"
-          echo "$RAW_IP" > ec2_ip.txt
+          terraform output -raw ec2_public_ip > ec2_ip.txt
+          cat ec2_ip.txt
 
       - name: Set EC2 IP as Environment Variable
         run: |
           IP=$(cat ./AzurePipelineMigrationTool/terraform/ec2_ip.txt | tr -d '\r\n')
           echo "EC2_PUBLIC_IP=$IP" >> $GITHUB_ENV
+          echo "Final EC2 IP set to: $IP"
 
       - name: Wait for EC2 to be ready
         run: sleep 60
