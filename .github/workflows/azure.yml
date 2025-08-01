@@ -31,17 +31,20 @@ jobs:
         working-directory: ./AzurePipelineMigrationTool/terraform
         run: terraform apply -auto-approve
 
-      - name: Get EC2 Public IP (Legacy Output Fix)
+      - name: Get EC2 Public IP (Modern Format Fix)
         id: get_ip
         working-directory: ./AzurePipelineMigrationTool/terraform
         run: |
           echo "Extracting EC2 IP..."
           IP=$(terraform output -raw ec2_public_ip)
           echo "✅ Cleaned IP: $IP"
-          echo "::set-output name=ec2ip::$IP"
+          echo "ec2ip=$IP" >> $GITHUB_OUTPUT
 
       - name: Wait for EC2 to be ready
         run: sleep 60
+
+      - name: Debug: Print IP
+        run: echo "IP is ${{ steps.get_ip.outputs.ec2ip }}"
 
       - name: Copy app to EC2
         uses: appleboy/scp-action@v0.1.4
