@@ -31,15 +31,14 @@ jobs:
         working-directory: ./AzurePipelineMigrationTool/terraform
         run: terraform apply -auto-approve
 
-      - name: Get EC2 Public IP
+      - name: Get EC2 Public IP (Legacy Output Fix)
         id: get_ip
         working-directory: ./AzurePipelineMigrationTool/terraform
         run: |
           echo "Extracting EC2 IP..."
-          RAW_OUTPUT=$(terraform output -raw ec2_public_ip)
-          IP=$(echo "$RAW_OUTPUT" | grep -Eo '([0-9]{1,3}\.){3}[0-9]{1,3}')
+          IP=$(terraform output -raw ec2_public_ip)
           echo "✅ Cleaned IP: $IP"
-          echo "ec2ip=$IP" >> $GITHUB_OUTPUT
+          echo "::set-output name=ec2ip::$IP"
 
       - name: Wait for EC2 to be ready
         run: sleep 60
