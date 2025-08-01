@@ -36,7 +36,9 @@ jobs:
         working-directory: ./AzurePipelineMigrationTool/terraform
         run: |
           echo "Extracting EC2 IP..."
-          IP=$(terraform output -raw ec2_public_ip)
+          RAW_OUTPUT=$(terraform output -raw ec2_public_ip)
+          IP=$(echo "$RAW_OUTPUT" | grep -Eo '([0-9]{1,3}\.){3}[0-9]{1,3}')
+          echo "✅ Cleaned IP: $IP"
           echo "ec2ip=$IP" >> $GITHUB_OUTPUT
 
       - name: Wait for EC2 to be ready
