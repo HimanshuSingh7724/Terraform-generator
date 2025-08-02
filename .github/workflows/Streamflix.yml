@@ -40,33 +40,36 @@ jobs:
       - name: Get EC2 IP
         id: get_ip
         run: |
-          IP=$(terraform -chdir=./terraform output -raw ec2_public_ip)
+          IP=$(terraform -chdir=./StreamFlix/terraform output -raw ec2_public_ip)
           echo "EC2_IP=$IP" >> $GITHUB_ENV
           echo "$IP" > ec2_ip.txt
 
       - name: Create SSH Known Hosts File
-        run: mkdir -p ~/.ssh && touch ~/.ssh/known_hosts
-
-      - name: Add EC2 Host to Known Hosts
-        run: ssh-keyscan -H ${{ env.EC2_IP }} >> ~/.ssh/known_hosts
+        run: |
+          mkdir -p ~/.ssh && touch ~/.ssh/known_hosts
+          ssh-keyscan -H ${{ env.EC2_IP }} >> ~/.ssh/known_hosts
 
       - name: Save EC2 Private Key to File
         run: |
           echo "${{ secrets.INSTANCE_KEY }}" > ${INSTANCE_KEY}
           chmod 400 ${INSTANCE_KEY}
 
-      - name: Copy Files to EC2
-        run: |
-          scp -i ${INSTANCE_KEY} -o StrictHostKeyChecking=no -r ./app ec2-user@${{ env.EC2_IP }}:/home/ec2-user/app
+      # OPTIONAL: If you still want to copy and build manually on EC2, keep this
+      # But it's **NOT needed** if you're already running the app in user_data
+      # You can remove the below 2 steps safely if user_data is enough
 
-      - name: SSH into EC2 and Run App
-        run: |
-          ssh -i ${INSTANCE_KEY} ec2-user@${{ env.EC2_IP }} << EOF
-          sudo yum update -y
-          sudo yum install -y docker git python3
-          sudo systemctl start docker
-          sudo usermod -aG docker ec2-user
-          cd /home/ec2-user/app
-          docker build -t streamflix-app .
-          docker run -d -p 80:5000 streamflix-app
-          EOF
+      # - name: Copy Files to EC2
+      #   run: |
+      #     scp -i ${INSTANCE_KEY} -o StrictHostKeyChecking=no -r ./app ec2-user@${{ env.EC2_IP }}:/home/ec2-user/app
+
+      # - name: SSH into EC2 and Run App
+      #   run: |
+      #     ssh -i ${INSTANCE_KEY} ec2-user@${{ env.EC2_IP }} << EOF
+      #     sudo yum update -y
+      #     sudo yum install -y docker git python3
+      #     sudo systemctl start docker
+      #     sudo usermod -aG docker ec2-user
+      #     cd /home/ec2-user/app
+      #     docker build -t streamflix-app .
+      #     docker run -d -p 80:5000 streamflix-app
+      #     EOF
