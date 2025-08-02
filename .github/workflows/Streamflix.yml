@@ -1,4 +1,4 @@
-name: Deploy StreamFlix
+name: Deploy StreamFlix App
 
 on:
   push:
@@ -10,12 +10,11 @@ jobs:
     runs-on: ubuntu-latest
 
     env:
-      AWS_ACCESS_KEY_ID: ${{ secrets.AWS_ACCESS_KEY }}
-      AWS_SECRET_ACCESS_KEY: ${{ secrets.AWS_SECRET_KEY }}
-      AWS_DEFAULT_REGION: eu-north-1
+      AWS_REGION: eu-north-1
+      INSTANCE_KEY: my_key.pem
 
     steps:
-      - name: Checkout code
+      - name: Checkout Code
         uses: actions/checkout@v3
 
       - name: Set up Terraform
@@ -24,47 +23,39 @@ jobs:
           terraform_version: 1.5.0
 
       - name: Terraform Init
-        working-directory: StreamFlix/terraform
         run: terraform init
+        working-directory: ./terraform
 
       - name: Terraform Apply
-        working-directory: StreamFlix/terraform
         run: terraform apply -auto-approve
+        working-directory: ./terraform
 
-      - name: Save EC2 IP to file
-        working-directory: StreamFlix/terraform
+      - name: Get EC2 IP
+        id: get_ip
         run: |
-          terraform output -raw ec2_public_ip | tr -d '\r' > ../../ec2_ip.txt
+          IP=$(terraform -chdir=./terraform output -raw ec2_public_ip)
+          echo "EC2_IP=$IP" >> $GITHUB_ENV
+          echo "$IP" > ec2_ip.txt
 
-      - name: Wait for EC2 to be ready
-        run: sleep 60
+      - name: Create SSH Known Hosts File
+        run: mkdir -p ~/.ssh && touch ~/.ssh/known_hosts
 
-      - name: Write private key file
+      - name: Add EC2 Host to Known Hosts
+        run: ssh-keyscan -H ${{ env.EC2_IP }} >> ~/.ssh/known_hosts
+
+      - name: Copy Files to EC2
         run: |
-          echo "$PRIVATE_KEY" > private_key.pem
-          chmod 400 private_key.pem
-        env:
-          PRIVATE_KEY: ${{ secrets.EC2_PRIVATE_KEY }}
+          chmod 400 ${INSTANCE_KEY}
+          scp -i ${INSTANCE_KEY} -r ./app ec2-user@${{ env.EC2_IP }}:/home/ec2-user/app
 
-      - name: Deploy App using scp and ssh
+      - name: SSH into EC2 and Run App
         run: |
-          EC2_IP=$(cat ec2_ip.txt)
-          echo "✅ Using IP: $EC2_IP"
-
-          # ✅ Create .ssh folder to avoid known_hosts error
-          mkdir -p ~/.ssh
-
-          # ✅ Add EC2 IP to known_hosts to avoid SSH prompt
-          ssh-keyscan -H $EC2_IP >> ~/.ssh/known_hosts
-
-          # ✅ Copy StreamFlix folder to EC2
-          scp -i private_key.pem -o StrictHostKeyChecking=no -r ./StreamFlix ubuntu@$EC2_IP:/home/ubuntu/
-
-          # ✅ SSH and deploy app using Docker
-          ssh -i private_key.pem -o StrictHostKeyChecking=no ubuntu@$EC2_IP <<EOF
-            cd /home/ubuntu/StreamFlix
-            sudo docker stop streamflix || true
-            sudo docker rm streamflix || true
-            sudo docker build -t streamflix .
-            sudo docker run -d -p 5000:5000 --name streamflix streamflix
+          ssh -i ${INSTANCE_KEY} ec2-user@${{ env.EC2_IP }} << EOF
+          sudo yum update -y
+          sudo yum install -y docker git python3
+          sudo systemctl start docker
+          sudo usermod -aG docker ec2-user
+          cd /home/ec2-user/app
+          docker build -t streamflix-app .
+          docker run -d -p 80:5000 streamflix-app
           EOF
