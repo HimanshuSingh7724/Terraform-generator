@@ -1,0 +1,21 @@
+<!-- app/templates/player.html -->
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>StreamFlix - Player</title>
+    <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css">
+</head>
+<body class="bg-dark text-white text-center">
+    <div class="container mt-5">
+        <h2>Now Playing: {{ title }}</h2>
+        <video width="800" height="450" controls autoplay class="mt-4">
+            <source src="{{ url_for('static', filename='videos/' + filename) }}" type="video/mp4">
+            Your browser does not support HTML5 video.
+        </video>
+        <div class="mt-3">
+            <a href="/" class="btn btn-light">Back to Home</a>
+        </div>
+    </div>
+</body>
+</html>

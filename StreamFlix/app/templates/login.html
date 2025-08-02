@@ -1,0 +1,28 @@
+<!-- app/templates/login.html -->
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Login - StreamFlix</title>
+    <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css">
+</head>
+<body class="bg-dark text-white">
+<div class="container mt-5">
+    <h2 class="text-center">Login to StreamFlix</h2>
+    <form method="POST" action="/login">
+        <div class="form-group">
+            <label>Email:</label>
+            <input type="email" name="email" class="form-control" required />
+        </div>
+        <div class="form-group">
+            <label>Password:</label>
+            <input type="password" name="password" class="form-control" required />
+        </div>
+        <button type="submit" class="btn btn-primary btn-block">Login</button>
+        <p class="text-center mt-3">
+            Don't have an account? <a href="/signup" class="text-info">Sign Up</a>
+        </p>
+    </form>
+</div>
+</body>
+</html>

@@ -1,0 +1,26 @@
+<!-- app/templates/index.html -->
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>StreamFlix - Home</title>
+    <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css">
+</head>
+<body class="bg-dark text-white">
+<div class="container mt-4">
+    <h1 class="text-center">Welcome to StreamFlix</h1>
+    <div class="row mt-4">
+        {% for video in videos %}
+        <div class="col-md-4 mb-4">
+            <div class="card bg-secondary text-white">
+                <div class="card-body">
+                    <h5 class="card-title">{{ video.title }}</h5>
+                    <a href="/play/{{ video.filename }}" class="btn btn-warning btn-block">Play</a>
+                </div>
+            </div>
+        </div>
+        {% endfor %}
+    </div>
+</div>
+</body>
+</html>
