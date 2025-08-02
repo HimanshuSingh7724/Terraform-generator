@@ -31,15 +31,14 @@ jobs:
         working-directory: StreamFlix/terraform
         run: terraform apply -auto-approve
 
-      - name: Get EC2 IP (Cleaned Output)
+      - name: Get EC2 IP (Safe Output)
         id: get_ip
         working-directory: StreamFlix/terraform
         run: |
-          RAW_OUTPUT=$(terraform output ec2_public_ip)
-          IP=$(echo "$RAW_OUTPUT" | grep -oE '([0-9]{1,3}\.){3}[0-9]{1,3}' | tr -d '\n')
-          echo "✅ Cleaned EC2 IP: $IP"
-          echo "EC2_IP=$IP" >> $GITHUB_ENV
-          echo "::set-output name=ec2_ip::$IP"
+          RAW_OUTPUT=$(terraform output -raw ec2_public_ip)
+          CLEANED_IP=$(echo "$RAW_OUTPUT" | tr -d '\r')
+          echo "ec2_ip=$CLEANED_IP" >> $GITHUB_OUTPUT
+          echo "✅ Cleaned IP: $CLEANED_IP"
 
       - name: Wait for EC2 to be ready
         run: sleep 60
