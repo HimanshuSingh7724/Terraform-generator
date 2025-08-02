@@ -1,9 +1,4 @@
-name: StreamFlix
-
-on:
-  push:
-    branches:
-      - mainname: Deploy StreamFlix
+name: Deploy StreamFlix
 
 on:
   push:
@@ -61,68 +56,6 @@ jobs:
         uses: appleboy/ssh-action@v1.0.0
         with:
           host: ${{ steps.get_ip.outputs.ec2_ip }}
-          username: ubuntu
-          key: ${{ secrets.EC2_PRIVATE_KEY }}
-          script: |
-            cd /home/ubuntu
-            sudo docker stop streamflix || true
-            sudo docker rm streamflix || true
-            sudo docker build -t streamflix .
-            sudo docker run -d -p 5000:5000 --name streamflix streamflix
-
-
-jobs:
-  deploy:
-    runs-on: ubuntu-latest
-
-    env:
-      AWS_ACCESS_KEY_ID: ${{ secrets.AWS_ACCESS_KEY }}
-      AWS_SECRET_ACCESS_KEY: ${{ secrets.AWS_SECRET_KEY }}
-      AWS_DEFAULT_REGION: eu-north-1
-
-    steps:
-      - name: Checkout code
-        uses: actions/checkout@v3
-
-      - name: Set up Terraform
-        uses: hashicorp/setup-terraform@v2
-        with:
-          terraform_version: 1.5.0
-
-      - name: Terraform Init
-        working-directory: StreamFlix/terraform
-        run: terraform init
-
-      - name: Terraform Apply
-        working-directory: StreamFlix/terraform
-        run: terraform apply -auto-approve
-
-      - name: Get EC2 IP (Safe way)
-        id: get_ip
-        working-directory: StreamFlix/terraform
-        run: |
-          IP=$(terraform output -raw ec2_public_ip | tr -d '\r')
-          CLEANED_IP=$(echo $IP | grep -Eo '([0-9]{1,3}\.){3}[0-9]{1,3}')
-          echo "✅ Cleaned EC2 IP: $CLEANED_IP"
-          echo "EC2_IP=$CLEANED_IP" >> $GITHUB_ENV
-
-      - name: Wait for EC2 to be ready
-        run: sleep 60
-
-      - name: Upload App to EC2
-        uses: appleboy/scp-action@v0.1.4
-        with:
-          host: ${{ env.EC2_IP }}
-          username: ubuntu
-          key: ${{ secrets.EC2_PRIVATE_KEY }}
-          source: "./StreamFlix"
-          target: "/home/ubuntu/"
-          strip_components: 1
-
-      - name: Run Docker on EC2
-        uses: appleboy/ssh-action@v1.0.0
-        with:
-          host: ${{ env.EC2_IP }}
           username: ubuntu
           key: ${{ secrets.EC2_PRIVATE_KEY }}
           script: |
