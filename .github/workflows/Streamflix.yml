@@ -39,30 +39,32 @@ jobs:
       - name: Wait for EC2 to be ready
         run: sleep 60
 
+      - name: Write private key file
+        run: |
+          echo "$PRIVATE_KEY" > private_key.pem
+          chmod 400 private_key.pem
+        env:
+          PRIVATE_KEY: ${{ secrets.EC2_PRIVATE_KEY }}
+
       - name: Deploy App using scp and ssh
         run: |
           EC2_IP=$(cat ec2_ip.txt)
           echo "✅ Using IP: $EC2_IP"
-          
-          # Add host key (optional, to avoid prompt)
-          ssh-keyscan -H $EC2_IP >> ~/.ssh/known_hosts
-          
-          # Copy app folder to EC2
-          scp -i private_key.pem -r ./StreamFlix ubuntu@$EC2_IP:/home/ubuntu/
 
-          # SSH and run docker commands
-          ssh -i private_key.pem ubuntu@$EC2_IP <<EOF
+          # ✅ Create .ssh folder to avoid known_hosts error
+          mkdir -p ~/.ssh
+
+          # ✅ Add EC2 IP to known_hosts to avoid SSH prompt
+          ssh-keyscan -H $EC2_IP >> ~/.ssh/known_hosts
+
+          # ✅ Copy StreamFlix folder to EC2
+          scp -i private_key.pem -o StrictHostKeyChecking=no -r ./StreamFlix ubuntu@$EC2_IP:/home/ubuntu/
+
+          # ✅ SSH and deploy app using Docker
+          ssh -i private_key.pem -o StrictHostKeyChecking=no ubuntu@$EC2_IP <<EOF
             cd /home/ubuntu/StreamFlix
             sudo docker stop streamflix || true
             sudo docker rm streamflix || true
             sudo docker build -t streamflix .
             sudo docker run -d -p 5000:5000 --name streamflix streamflix
           EOF
-        env:
-          # Make sure you save your private key as a GitHub Secret and write it to a file
-          PRIVATE_KEY: ${{ secrets.EC2_PRIVATE_KEY }}
-
-      - name: Write private key file
-        run: |
-          echo "$PRIVATE_KEY" > private_key.pem
-          chmod 400 private_key.pem
