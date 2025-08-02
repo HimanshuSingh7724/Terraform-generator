@@ -35,9 +35,9 @@ jobs:
         id: get_ip
         working-directory: StreamFlix/terraform
         run: |
-          IP=$(terraform output -raw ec2_public_ip | head -n 1)
+          IP=$(terraform output -raw ec2_public_ip)
+          echo "✅ EC2 IP is $IP"
           echo "EC2_IP=$IP" >> $GITHUB_ENV
-          echo "✅ EC2 Public IP: $IP"
 
       - name: Wait for EC2 to be ready
         run: sleep 60
@@ -50,6 +50,7 @@ jobs:
           key: ${{ secrets.EC2_PRIVATE_KEY }}
           source: "./StreamFlix"
           target: "/home/ubuntu/"
+          strip_components: 1
 
       - name: Run Docker on EC2
         uses: appleboy/ssh-action@v1.0.0
@@ -58,7 +59,7 @@ jobs:
           username: ubuntu
           key: ${{ secrets.EC2_PRIVATE_KEY }}
           script: |
-            cd /home/ubuntu/StreamFlix
+            cd /home/ubuntu
             sudo docker stop streamflix || true
             sudo docker rm streamflix || true
             sudo docker build -t streamflix .
