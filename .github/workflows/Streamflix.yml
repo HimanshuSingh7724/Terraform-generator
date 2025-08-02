@@ -31,37 +31,38 @@ jobs:
         working-directory: StreamFlix/terraform
         run: terraform apply -auto-approve
 
-      - name: Get EC2 IP (Safe Output)
-        id: get_ip
+      - name: Save EC2 IP to file
         working-directory: StreamFlix/terraform
         run: |
-          RAW_OUTPUT=$(terraform output -raw ec2_public_ip)
-          CLEANED_IP=$(echo "$RAW_OUTPUT" | tr -d '\r')
-          echo "ec2_ip=$CLEANED_IP" >> $GITHUB_OUTPUT
-          echo "✅ Cleaned IP: $CLEANED_IP"
+          terraform output -raw ec2_public_ip | tr -d '\r' > ../../ec2_ip.txt
 
       - name: Wait for EC2 to be ready
         run: sleep 60
 
-      - name: Upload App to EC2
-        uses: appleboy/scp-action@v0.1.4
-        with:
-          host: ${{ steps.get_ip.outputs.ec2_ip }}
-          username: ubuntu
-          key: ${{ secrets.EC2_PRIVATE_KEY }}
-          source: "./StreamFlix"
-          target: "/home/ubuntu/"
-          strip_components: 1
+      - name: Deploy App using scp and ssh
+        run: |
+          EC2_IP=$(cat ec2_ip.txt)
+          echo "✅ Using IP: $EC2_IP"
+          
+          # Add host key (optional, to avoid prompt)
+          ssh-keyscan -H $EC2_IP >> ~/.ssh/known_hosts
+          
+          # Copy app folder to EC2
+          scp -i private_key.pem -r ./StreamFlix ubuntu@$EC2_IP:/home/ubuntu/
 
-      - name: Run Docker on EC2
-        uses: appleboy/ssh-action@v1.0.0
-        with:
-          host: ${{ steps.get_ip.outputs.ec2_ip }}
-          username: ubuntu
-          key: ${{ secrets.EC2_PRIVATE_KEY }}
-          script: |
-            cd /home/ubuntu
+          # SSH and run docker commands
+          ssh -i private_key.pem ubuntu@$EC2_IP <<EOF
+            cd /home/ubuntu/StreamFlix
             sudo docker stop streamflix || true
             sudo docker rm streamflix || true
             sudo docker build -t streamflix .
             sudo docker run -d -p 5000:5000 --name streamflix streamflix
+          EOF
+        env:
+          # Make sure you save your private key as a GitHub Secret and write it to a file
+          PRIVATE_KEY: ${{ secrets.EC2_PRIVATE_KEY }}
+
+      - name: Write private key file
+        run: |
+          echo "$PRIVATE_KEY" > private_key.pem
+          chmod 400 private_key.pem
