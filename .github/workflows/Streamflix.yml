@@ -24,16 +24,16 @@ jobs:
           terraform_version: 1.5.0
 
       - name: Terraform Init
-        working-directory: StreamFlix
+        working-directory: StreamFlix/terraform
         run: terraform init
 
       - name: Terraform Apply
-        working-directory: StreamFlix
+        working-directory: StreamFlix/terraform
         run: terraform apply -auto-approve
 
       - name: Get EC2 IP
         id: ip
-        working-directory: StreamFlix
+        working-directory: StreamFlix/terraform
         run: |
           echo "EC2_IP=$(terraform output -raw ec2_public_ip)" >> $GITHUB_ENV
 
