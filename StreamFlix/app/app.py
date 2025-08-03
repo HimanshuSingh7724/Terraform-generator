@@ -25,7 +25,10 @@ def login():
 @app.route('/signup', methods=['GET', 'POST'])
 def signup():
     if request.method == 'POST':
-        create_user(request.form['username'], request.form['password'])
+        name = request.form['name']
+        email = request.form['email']
+        password = request.form['password']
+        create_user(name, password)  # Note: email is captured but not stored unless create_user is updated
         return redirect(url_for('login'))
     return render_template('signup.html')
 
