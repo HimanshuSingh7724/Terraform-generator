@@ -48,14 +48,16 @@ jobs:
           echo "${{ secrets.INSTANCE_KEY }}" > $INSTANCE_KEY_FILE
           chmod 400 $INSTANCE_KEY_FILE
 
+      - name: Create .ssh directory
+        run: mkdir -p ~/.ssh
+
       - name: Add EC2 to known_hosts
         run: |
-          mkdir -p ~/.ssh
           ssh-keyscan -H ${{ env.ec2_ip }} >> ~/.ssh/known_hosts
 
       - name: Copy App Files to EC2
         run: |
-          scp -i $INSTANCE_KEY_FILE -o StrictHostKeyChecking=no -r ./app ec2-user@${{ env.ec2_ip }}:/home/ec2-user/app
+          scp -i $INSTANCE_KEY_FILE -o StrictHostKeyChecking=no -r ./StreamFlix ec2-user@${{ env.ec2_ip }}:/home/ec2-user/StreamFlix
 
       - name: SSH into EC2 and Run Docker App
         run: |
@@ -64,7 +66,7 @@ jobs:
           sudo yum install -y docker git python3
           sudo systemctl start docker
           sudo usermod -aG docker ec2-user
-          cd /home/ec2-user/app
+          cd /home/ec2-user/StreamFlix
           docker build -t streamflix-app .
           docker run -d -p 80:5000 streamflix-app
           EOF
