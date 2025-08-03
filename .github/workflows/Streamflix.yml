@@ -50,6 +50,7 @@ jobs:
 
       - name: Add EC2 to known_hosts
         run: |
+          mkdir -p ~/.ssh
           ssh-keyscan -H ${{ env.ec2_ip }} >> ~/.ssh/known_hosts
 
       - name: Copy App Files to EC2
