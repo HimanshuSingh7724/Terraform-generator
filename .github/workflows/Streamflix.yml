@@ -67,6 +67,6 @@ jobs:
           sudo systemctl start docker
           sudo usermod -aG docker ec2-user
           cd /home/ec2-user/StreamFlix
-          docker build -t streamflix-app .
-          docker run -d -p 80:5000 streamflix-app
+          sudo docker build -t streamflix-app .
+          sudo docker run -d -p 80:5000 streamflix-app
           EOF
