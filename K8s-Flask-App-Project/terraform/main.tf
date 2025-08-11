@@ -2,27 +2,39 @@ provider "aws" {
   region = "us-west-1"
 }
 
-resource "tls_private_key" "my_key" {
-  algorithm = "RSA"
-  rsa_bits  = 4096
+# VPC & networking (EKS ke liye required)
+module "vpc" {
+  source  = "terraform-aws-modules/vpc/aws"
+  version = "5.0.0"
+
+  name = "eks-vpc"
+  cidr = "10.0.0.0/16"
+
+  azs             = ["us-west-1a", "us-west-1b"]
+  private_subnets = ["10.0.1.0/24", "10.0.2.0/24"]
+  public_subnets  = ["10.0.3.0/24", "10.0.4.0/24"]
+
+  enable_nat_gateway = true
 }
 
-resource "aws_key_pair" "deployer_key" {
-  key_name   = "my_key"
-  public_key = tls_private_key.my_key.public_key_openssh
-}
+# EKS cluster
+module "eks" {
+  source          = "terraform-aws-modules/eks/aws"
+  cluster_name    = "my-cluster"
+  cluster_version = "1.29"
+  subnets         = module.vpc.private_subnets
+  vpc_id          = module.vpc.vpc_id
 
-resource "local_file" "private_key" {
-  content  = tls_private_key.my_key.private_key_pem
-  filename = "${path.module}/my_key.pem"
-}
-
-resource "aws_instance" "k8s_server" {
-  ami           = "ami-0d9858aa3c6322f73" # Amazon Linux 2 us-west-1
-  instance_type = "t2.micro"
-  key_name      = aws_key_pair.deployer_key.key_name
-
-  tags = {
-    Name = "K8s-Server"
+  eks_managed_node_groups = {
+    default = {
+      instance_types = ["t3.medium"]
+      desired_size   = 2
+      min_size       = 1
+      max_size       = 3
+    }
   }
+}
+
+output "cluster_name" {
+  value = module.eks.cluster_name
 }
