@@ -3,37 +3,27 @@ terraform {
   required_providers {
     aws = {
       source  = "hashicorp/aws"
-      version = ">= 5.0"
+      version = "~> 5.0"
     }
   }
 }
 
+# AWS Provider
 provider "aws" {
-  region = var.aws_region
+  region = "us-west-1"
 }
 
-# Variables
-variable "aws_region" {
-  description = "AWS region for EKS deployment"
-  type        = string
-  default     = "us-west-1"
-}
-
-variable "cluster_name" {
-  description = "EKS Cluster name"
-  type        = string
-  default     = "my-cluster"
-}
-
-# VPC module
+# --------------------
+# VPC for EKS
+# --------------------
 module "vpc" {
   source  = "terraform-aws-modules/vpc/aws"
-  version = "5.0.0"
+  version = "5.1.2"
 
-  name = "${var.cluster_name}-vpc"
+  name = "my-cluster-vpc"
   cidr = "10.0.0.0/16"
 
-  azs             = ["${var.aws_region}a", "${var.aws_region}b"]
+  azs             = ["us-west-1a", "us-west-1b"]
   private_subnets = ["10.0.1.0/24", "10.0.2.0/24"]
   public_subnets  = ["10.0.3.0/24", "10.0.4.0/24"]
 
@@ -41,14 +31,17 @@ module "vpc" {
   single_nat_gateway = true
 }
 
+# --------------------
 # EKS Cluster
+# --------------------
 module "eks" {
   source          = "terraform-aws-modules/eks/aws"
-  version         = "20.8.3"
-  cluster_name    = var.cluster_name
-  cluster_version = "1.29"
-  subnet_ids      = module.vpc.private_subnets
-  vpc_id          = module.vpc.vpc_id
+  version         = "20.24.0" # Latest to avoid GPU errors
+  cluster_name    = "my-cluster"
+  cluster_version = "1.30"
+
+  subnet_ids = module.vpc.private_subnets
+  vpc_id     = module.vpc.vpc_id
 
   eks_managed_node_groups = {
     default = {
@@ -59,10 +52,13 @@ module "eks" {
     }
   }
 
-  depends_on = [module.vpc] # Ensure VPC is ready before EKS
+  # Ensure VPC is created before EKS
+  depends_on = [module.vpc]
 }
 
-# Output values
+# --------------------
+# Outputs
+# --------------------
 output "cluster_name" {
   description = "EKS cluster name"
   value       = module.eks.cluster_name
@@ -70,5 +66,5 @@ output "cluster_name" {
 
 output "update_kubeconfig_command" {
   description = "Command to update kubeconfig"
-  value       = "aws eks update-kubeconfig --name ${module.eks.cluster_name} --region ${var.aws_region}"
+  value       = "aws eks update-kubeconfig --name ${module.eks.cluster_name} --region us-west-1"
 }
