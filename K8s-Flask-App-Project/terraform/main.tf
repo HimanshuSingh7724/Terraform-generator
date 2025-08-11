@@ -23,12 +23,13 @@ module "vpc" {
   name = "my-cluster-vpc"
   cidr = "10.0.0.0/16"
 
-  azs             = ["us-west-1a", "us-west-1b"]
+  # us-west-1 ke AZs
+  azs             = ["us-west-1a", "us-west-1c"]
   private_subnets = ["10.0.1.0/24", "10.0.2.0/24"]
   public_subnets  = ["10.0.3.0/24", "10.0.4.0/24"]
 
-  enable_nat_gateway = true
-  single_nat_gateway = true
+  enable_nat_gateway = false # Free tier ke liye NAT Gateway band rakho (cost bachaane ke liye)
+  single_nat_gateway = false
 }
 
 # --------------------
@@ -36,7 +37,7 @@ module "vpc" {
 # --------------------
 module "eks" {
   source          = "terraform-aws-modules/eks/aws"
-  version         = "20.24.0" # Latest to avoid GPU errors
+  version         = "20.24.0"
   cluster_name    = "my-cluster"
   cluster_version = "1.30"
 
@@ -45,14 +46,14 @@ module "eks" {
 
   eks_managed_node_groups = {
     default = {
-      instance_types = ["t3.medium"]
-      desired_size   = 2
+      instance_types = ["t3.micro"] # Free tier EC2 type
+      desired_size   = 1
       min_size       = 1
-      max_size       = 3
+      max_size       = 1
+      key_name       = "my_key" # apna AWS EC2 key pair ka naam
     }
   }
 
-  # Ensure VPC is created before EKS
   depends_on = [module.vpc]
 }
 
