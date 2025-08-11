@@ -23,7 +23,7 @@ jobs:
 
       - name: Build and Push Docker Image
         run: |
-          docker build -t ${{ secrets.DOCKER_USERNAME }}/flask-k8s:latest .
+          docker build -t ${{ secrets.DOCKER_USERNAME }}/flask-k8s:latest -f K8s-Flask-App-Project/Dockerfile K8s-Flask-App-Project
           docker push ${{ secrets.DOCKER_USERNAME }}/flask-k8s:latest
 
       # AWS credentials setup
