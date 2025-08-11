@@ -23,7 +23,7 @@ jobs:
 
       - name: Build and Push Docker Image
         run: |
-          docker build -t ${{ secrets.DOCKER_USERNAME }}/flask-k8s:latest .
+          docker build -t ${{ secrets.DOCKER_USERNAME }}/flask-k8s:latest -f K8s-Flask-App-Project/Dockerfile K8s-Flask-App-Project
           docker push ${{ secrets.DOCKER_USERNAME }}/flask-k8s:latest
 
       - name: Set up kubectl
@@ -33,5 +33,5 @@ jobs:
 
       - name: Deploy to Kubernetes
         run: |
-          kubectl apply -f kubernetes/deployment.yaml
-          kubectl apply -f kubernetes/service.yaml
+          kubectl apply -f K8s-Flask-App-Project/kubernetes/deployment.yaml
+          kubectl apply -f K8s-Flask-App-Project/kubernetes/service.yaml
