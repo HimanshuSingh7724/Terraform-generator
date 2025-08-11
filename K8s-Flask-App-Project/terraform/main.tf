@@ -14,7 +14,7 @@ provider "aws" {
 }
 
 # --------------------
-# VPC for EKS
+# VPC for EKS (free tier friendly)
 # --------------------
 module "vpc" {
   source  = "terraform-aws-modules/vpc/aws"
@@ -23,12 +23,13 @@ module "vpc" {
   name = "my-cluster-vpc"
   cidr = "10.0.0.0/16"
 
-  # us-west-1 ke AZs
+  # us-west-1 ke valid AZs
   azs             = ["us-west-1a", "us-west-1c"]
   private_subnets = ["10.0.1.0/24", "10.0.2.0/24"]
   public_subnets  = ["10.0.3.0/24", "10.0.4.0/24"]
 
-  enable_nat_gateway = false # Free tier ke liye NAT Gateway band rakho (cost bachaane ke liye)
+  # NAT Gateway band (free tier cost saving)
+  enable_nat_gateway = false
   single_nat_gateway = false
 }
 
@@ -46,11 +47,11 @@ module "eks" {
 
   eks_managed_node_groups = {
     default = {
-      instance_types = ["t3.micro"] # Free tier EC2 type
+      instance_types = ["t3.micro"]  # Free tier EC2 instance type
       desired_size   = 1
       min_size       = 1
       max_size       = 1
-      key_name       = "my_key" # apna AWS EC2 key pair ka naam
+      key_name       = "my_key"     # Apna AWS EC2 key pair ka naam daalna
     }
   }
 
