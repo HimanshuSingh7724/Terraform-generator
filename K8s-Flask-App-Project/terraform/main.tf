@@ -9,7 +9,20 @@ terraform {
 }
 
 provider "aws" {
-  region = "us-west-1"
+  region = var.aws_region
+}
+
+# Variables
+variable "aws_region" {
+  description = "AWS region for EKS deployment"
+  type        = string
+  default     = "us-west-1"
+}
+
+variable "cluster_name" {
+  description = "EKS Cluster name"
+  type        = string
+  default     = "my-cluster"
 }
 
 # VPC module
@@ -17,10 +30,10 @@ module "vpc" {
   source  = "terraform-aws-modules/vpc/aws"
   version = "5.0.0"
 
-  name = "eks-vpc"
+  name = "${var.cluster_name}-vpc"
   cidr = "10.0.0.0/16"
 
-  azs             = ["us-west-1a", "us-west-1b"]
+  azs             = ["${var.aws_region}a", "${var.aws_region}b"]
   private_subnets = ["10.0.1.0/24", "10.0.2.0/24"]
   public_subnets  = ["10.0.3.0/24", "10.0.4.0/24"]
 
@@ -32,7 +45,7 @@ module "vpc" {
 module "eks" {
   source          = "terraform-aws-modules/eks/aws"
   version         = "20.8.3"
-  cluster_name    = "my-cluster"
+  cluster_name    = var.cluster_name
   cluster_version = "1.29"
   subnet_ids      = module.vpc.private_subnets
   vpc_id          = module.vpc.vpc_id
@@ -45,6 +58,8 @@ module "eks" {
       max_size       = 3
     }
   }
+
+  depends_on = [module.vpc] # Ensure VPC is ready before EKS
 }
 
 # Output values
@@ -55,5 +70,5 @@ output "cluster_name" {
 
 output "update_kubeconfig_command" {
   description = "Command to update kubeconfig"
-  value       = "aws eks update-kubeconfig --name ${module.eks.cluster_name} --region us-west-1"
+  value       = "aws eks update-kubeconfig --name ${module.eks.cluster_name} --region ${var.aws_region}"
 }
