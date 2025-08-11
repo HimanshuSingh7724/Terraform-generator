@@ -57,6 +57,7 @@ jobs:
         with:
           version: v1.28.0
 
+      # Deploy Kubernetes manifests
       - name: Deploy to Kubernetes
         run: |
           kubectl apply -f K8s-Flask-App-Project/kubernetes/deployment.yaml
