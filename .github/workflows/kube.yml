@@ -23,8 +23,21 @@ jobs:
 
       - name: Build and Push Docker Image
         run: |
-          docker build -t ${{ secrets.DOCKER_USERNAME }}/flask-k8s:latest -f K8s-Flask-App-Project/Dockerfile K8s-Flask-App-Project
+          docker build -t ${{ secrets.DOCKER_USERNAME }}/flask-k8s:latest .
           docker push ${{ secrets.DOCKER_USERNAME }}/flask-k8s:latest
+
+      # AWS credentials setup
+      - name: Configure AWS credentials
+        uses: aws-actions/configure-aws-credentials@v4
+        with:
+          aws-access-key-id: ${{ secrets.AWS_ACCESS_KEY }}
+          aws-secret-access-key: ${{ secrets.AWS_SECRET_KEY }}
+          aws-region: ${{ secrets.AWS_REGION }}
+
+      # EKS kubeconfig setup
+      - name: Set up kubeconfig for EKS
+        run: |
+          aws eks update-kubeconfig --name my-cluster --region ${{ secrets.AWS_REGION }}
 
       - name: Set up kubectl
         uses: azure/setup-kubectl@v3
