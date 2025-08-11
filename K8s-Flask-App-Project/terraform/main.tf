@@ -1,8 +1,18 @@
+terraform {
+  required_version = ">= 1.3.0"
+  required_providers {
+    aws = {
+      source  = "hashicorp/aws"
+      version = ">= 5.0"
+    }
+  }
+}
+
 provider "aws" {
   region = "us-west-1"
 }
 
-# VPC & networking (EKS ke liye required)
+# VPC module
 module "vpc" {
   source  = "terraform-aws-modules/vpc/aws"
   version = "5.0.0"
@@ -15,14 +25,16 @@ module "vpc" {
   public_subnets  = ["10.0.3.0/24", "10.0.4.0/24"]
 
   enable_nat_gateway = true
+  single_nat_gateway = true
 }
 
-# EKS cluster
+# EKS Cluster
 module "eks" {
   source          = "terraform-aws-modules/eks/aws"
+  version         = "20.8.3"
   cluster_name    = "my-cluster"
   cluster_version = "1.29"
-  subnets         = module.vpc.private_subnets
+  subnet_ids      = module.vpc.private_subnets
   vpc_id          = module.vpc.vpc_id
 
   eks_managed_node_groups = {
@@ -35,6 +47,13 @@ module "eks" {
   }
 }
 
+# Output values
 output "cluster_name" {
-  value = module.eks.cluster_name
+  description = "EKS cluster name"
+  value       = module.eks.cluster_name
+}
+
+output "update_kubeconfig_command" {
+  description = "Command to update kubeconfig"
+  value       = "aws eks update-kubeconfig --name ${module.eks.cluster_name} --region us-west-1"
 }
