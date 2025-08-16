@@ -50,6 +50,11 @@ jobs:
       working-directory: ./K8s-Flask-App-Project/terraform
       run: terraform apply -auto-approve
 
+    # ---------------- Configure AWS EKS kubeconfig ----------------
+    - name: Configure kubeconfig
+      run: |
+        aws eks --region ${{ secrets.AWS_REGION }} update-kubeconfig --name flask-cluster
+
     # ---------------- Kubernetes Deployment ----------------
     - name: Apply Kubernetes manifests
       uses: azure/k8s-deploy@v4
@@ -57,3 +62,4 @@ jobs:
         manifests: |
           ./K8s-Flask-App-Project/k8s/deployment.yaml
           ./K8s-Flask-App-Project/k8s/service.yaml
+        kubeconfig: ${{ runner.home }}/.kube/config
