@@ -3,6 +3,7 @@ provider "aws" {
 }
 
 # ---------------- EKS Cluster ----------------
+# Agar cluster already exist karta hai, to Terraform ko import karke state me laa sakte hain
 resource "aws_eks_cluster" "my_cluster" {
   name     = "flask-cluster"
   role_arn = "arn:aws:iam::038462747266:role/eksClusterRole"
@@ -14,7 +15,7 @@ resource "aws_eks_cluster" "my_cluster" {
     ]
   }
 
-  # Optional: skip creation if cluster already exists in state
+  # Prevent accidental destroy
   lifecycle {
     prevent_destroy = true
   }
