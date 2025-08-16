@@ -16,9 +16,7 @@ resource "aws_eks_cluster" "my_cluster" {
   }
 
   # Prevent accidental destroy
-  lifecycle {
-    prevent_destroy = true
-  }
+ 
 }
 
 # ---------------- Outputs ----------------
