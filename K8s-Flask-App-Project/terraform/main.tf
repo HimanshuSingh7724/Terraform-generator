@@ -2,23 +2,36 @@ provider "aws" {
   region = "us-west-1"
 }
 
-# ---------------- Use Existing IAM Role ----------------
-data "aws_iam_role" "eks_role" {
-  name = "eksClusterRole"   # Existing IAM role
+# ---------------- IAM Role ----------------
+resource "aws_iam_role" "eks_role" {
+  name = "eksClusterRole"
+  assume_role_policy = jsonencode({
+    Version = "2012-10-17"
+    Statement = [{
+      Action    = "sts:AssumeRole"
+      Effect    = "Allow"
+      Principal = {
+        Service = "eks.amazonaws.com"
+      }
+    }]
+  })
+}
+
+# Attach EKS Managed Policy
+resource "aws_iam_role_policy_attachment" "eks_role_attach" {
+  role       = aws_iam_role.eks_role.name
+  policy_arn = "arn:aws:iam::aws:policy/AmazonEKSClusterPolicy"
 }
 
 # ---------------- EKS Cluster ----------------
 resource "aws_eks_cluster" "my_cluster" {
   name     = "flask-cluster"
-  role_arn = data.aws_iam_role.eks_role.arn
+  role_arn = aws_iam_role.eks_role.arn
 
   vpc_config {
-    # Directly specify your existing subnet ID
-    subnet_ids = ["subnet-04d9871c9a6fe442b"]
+    subnet_ids = [
+      "subnet-04d9871c9a6fe442b", 
+      "subnet-0f47850e35c446822"
+    ]
   }
-}
-
-# Optional output for cluster name
-output "cluster_name" {
-  value = aws_eks_cluster.my_cluster.name
 }
