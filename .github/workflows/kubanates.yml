@@ -29,7 +29,7 @@ jobs:
     - name: Push Docker image
       run: docker push ${{ secrets.DOCKER_USERNAME }}/flask-app:latest
 
-    # ---------------- Terraform Init & Apply ----------------
+    # ---------------- Terraform Init ----------------
     - name: Setup Terraform
       uses: hashicorp/setup-terraform@v2
       with:
@@ -39,6 +39,13 @@ jobs:
       working-directory: ./K8s-Flask-App-Project/terraform
       run: terraform init
 
+    # ---------------- Terraform Import (Existing EKS Cluster) ----------------
+    - name: Import existing EKS cluster
+      working-directory: ./K8s-Flask-App-Project/terraform
+      run: |
+        terraform import aws_eks_cluster.my_cluster flask-cluster || echo "Cluster already imported"
+
+    # ---------------- Terraform Apply ----------------
     - name: Terraform Apply
       working-directory: ./K8s-Flask-App-Project/terraform
       run: terraform apply -auto-approve
