@@ -6,8 +6,8 @@ provider "aws" {
 resource "aws_eks_cluster" "my_cluster" {
   name     = "flask-cluster"
 
-  # Existing IAM Role ARN use karein
-  role_arn = "arn:aws:iam::<AWS_ACCOUNT_ID>:role/eksClusterRole"
+  # Existing IAM Role ARN
+  role_arn = "arn:aws:iam::038462747266:role/eksClusterRole"
 
   vpc_config {
     subnet_ids = [
