@@ -1,0 +1,65 @@
+name: StreamFlix CI/CD
+
+on:
+  push:
+    branches: ["main"]
+
+jobs:
+  build-and-deploy:
+    runs-on: ubuntu-latest
+    defaults:
+      run:
+        working-directory: ./MovieStream-App  # yahan se sab commands default repo root se chalengi
+
+    steps:
+    # Step 1: Checkout repo
+    - name: Checkout repo
+      uses: actions/checkout@v3
+
+    # Step 2: Configure AWS credentials
+    - name: Configure AWS Credentials
+      uses: aws-actions/configure-aws-credentials@v2
+      with:
+        aws-access-key-id: ${{ secrets.AWS_ACCESS_KEY }}
+        aws-secret-access-key: ${{ secrets.AWS_SECRET_KEY }}
+        aws-region: ${{ secrets.AWS_REGION }}
+
+    # Step 3: Setup Terraform
+    - name: Setup Terraform
+      uses: hashicorp/setup-terraform@v2
+
+    # Step 4: Terraform Init
+    - name: Terraform Init
+      working-directory: ./MovieStream-App/terraform
+      run: terraform init
+
+    # Step 5: Terraform Apply (Infra create/update)
+    - name: Terraform Apply
+      working-directory: ./MovieStream-App/terraform
+      run: terraform apply -auto-approve
+
+    # Step 6: Login to DockerHub
+    - name: Login to DockerHub
+      run: echo "${{ secrets.DOCKER_PASSWORD }}" | docker login -u "${{ secrets.DOCKER_USERNAME }}" --password-stdin
+
+    # Step 7: Build Docker image
+    - name: Build Docker image
+      working-directory: ./
+      run: docker build -t ${{ secrets.DOCKER_USERNAME }}/streamflix:latest .
+
+    # Step 8: Push Docker image
+    - name: Push Docker image
+      run: docker push ${{ secrets.DOCKER_USERNAME }}/streamflix:latest
+
+    # Step 9: Setup kubectl
+    - name: Setup kubectl
+      uses: azure/setup-kubectl@v3
+      with:
+        version: 'v1.26.0'
+
+    # Step 10: Deploy to Kubernetes
+    - name: Deploy to Kubernetes
+      working-directory: ./MovieStream-App/kubernetes
+      run: |
+        kubectl apply -f deployment.yaml
+        kubectl apply -f service.yaml
