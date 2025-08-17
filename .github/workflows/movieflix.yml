@@ -42,7 +42,7 @@ jobs:
     - name: Login to DockerHub
       run: echo "${{ secrets.DOCKER_PASSWORD }}" | docker login -u "${{ secrets.DOCKER_USERNAME }}" --password-stdin
 
-    # Step 7: Build Docker image (FIXED PATH)
+    # Step 7: Build Docker image
     - name: Build Docker image
       run: docker build -t ${{ secrets.DOCKER_USERNAME }}/streamflix:latest -f Dockerfile .
 
@@ -56,7 +56,11 @@ jobs:
       with:
         version: 'v1.26.0'
 
-    # Step 10: Deploy to Kubernetes
+    # Step 10: Update kubeconfig for EKS
+    - name: Update kubeconfig for EKS
+      run: aws eks update-kubeconfig --region ${{ secrets.AWS_REGION }} --name moviestream-cluster
+
+    # Step 11: Deploy to Kubernetes
     - name: Deploy to Kubernetes
       working-directory: ./MovieStream-App/kubernetes
       run: |
