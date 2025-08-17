@@ -19,9 +19,9 @@ resource "aws_eks_cluster" "moviestream_cluster" {
   ]
 }
 
-# IAM Role for EKS
+# IAM Role for EKS (new name)
 resource "aws_iam_role" "eks_role" {
-  name = "eks-moviestream-role"
+  name = "eks-moviestream-role-new"   # नया नाम
 
   assume_role_policy = jsonencode({
     Version = "2012-10-17"
