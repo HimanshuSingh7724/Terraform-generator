@@ -1,0 +1,20 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: moviestream-deployment
+spec:
+  replicas: 2
+  selector:
+    matchLabels:
+      app: moviestream
+  template:
+    metadata:
+      labels:
+        app: moviestream
+    spec:
+      containers:
+        - name: moviestream
+          image: moviestream-app:latest
+          imagePullPolicy: Never   # ✅ Local image use karo, pull mat karo
+          ports:
+            - containerPort: 5000

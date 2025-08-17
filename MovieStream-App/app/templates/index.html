@@ -1,0 +1,17 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>MovieStream - Home</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
+</head>
+<body>
+    <h1>Welcome, {{ username }} 🎬</h1>
+    <h2>Available Movies:</h2>
+    <ul>
+        <li><a href="/watch/Inception">Inception</a></li>
+        <li><a href="/watch/Interstellar">Interstellar</a></li>
+        <li><a href="/watch/Tenet">Tenet</a></li>
+    </ul>
+    <a href="/logout">Logout</a>
+</body>
+</html>
