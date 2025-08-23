@@ -35,13 +35,13 @@ jobs:
       - name: Install Trivy
         run: |
           sudo apt-get update
-          sudo apt-get install -y wget
-          wget -qO- https://github.com/aquasecurity/trivy/releases/latest/download/trivy_0.49.0_Linux-64bit.deb > trivy.deb
-          sudo dpkg -i trivy.deb
+          sudo apt-get install -y curl
+          curl -L https://github.com/aquasecurity/trivy/releases/latest/download/trivy_0.49.0_Linux-64bit.deb -o trivy.deb
+          sudo dpkg -i trivy.deb || sudo apt-get install -f -y
 
       - name: Terraform Init
         run: terraform init
-        working-directory: ./terraform  # Optional override for Terraform folder
+        working-directory: ./terraform  # Terraform folder override
 
       - name: Terraform Apply
         run: terraform apply -auto-approve \
