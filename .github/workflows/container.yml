@@ -42,9 +42,8 @@ jobs:
       - name: Setup Terraform
         uses: hashicorp/setup-terraform@v3
         with:
-          terraform_version: 1.7.6   # Latest available compatible version
+          terraform_version: 1.7.5   # Compatible Terraform version
           terraform_wrapper: true
-          cli_config_credentials_hostname: app.terraform.io
 
       - name: Terraform Init
         run: terraform init
