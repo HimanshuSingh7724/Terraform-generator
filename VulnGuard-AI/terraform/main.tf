@@ -38,7 +38,7 @@ resource "aws_security_group" "vgai_sg" {
 
 # EC2 Instance
 resource "aws_instance" "vgai_server" {
-  ami                    = "ami-0945610b37068d87a"
+  ami                    = "ami-0fa3a4915333e2850"
   instance_type           = "t2.micro"
   key_name                = var.key_name
   vpc_security_group_ids  = [aws_security_group.vgai_sg.id]
