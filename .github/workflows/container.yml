@@ -17,7 +17,7 @@ jobs:
       KEY_NAME: ${{ secrets.MY_KEY }}
     defaults:
       run:
-        working-directory: ./VulnGuard-AI
+        working-directory: ./VulnGuard-AI/terraform
 
     steps:
       - uses: actions/checkout@v3
@@ -47,14 +47,14 @@ jobs:
 
       - name: Terraform Init
         run: terraform init
-        working-directory: ./terraform
+        working-directory: ./VulnGuard-AI/terraform
 
       - name: Terraform Apply
         run: terraform apply -auto-approve \
             -var "docker_username=${{ secrets.DOCKER_USERNAME }}" \
             -var "docker_password=${{ secrets.DOCKER_PASSWORD }}" \
             -var "key_name=${{ secrets.MY_KEY }}"
-        working-directory: ./terraform
+        working-directory: ./VulnGuard-AI/terraform
 
       - name: Run VulnGuard-AI Scan
         run: python cli/vgai.py --path ./examples/vulnerable_app --dockerfile ./examples/vulnerable_app/Dockerfile --requirements ./examples/vulnerable_app/requirements.txt --apply
