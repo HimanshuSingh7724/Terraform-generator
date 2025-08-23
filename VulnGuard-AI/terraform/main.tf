@@ -43,16 +43,18 @@ resource "aws_instance" "vgai_server" {
   key_name                = var.key_name
   vpc_security_group_ids  = [aws_security_group.vgai_sg.id]
 
-  # Docker install + VulnGuard-AI container
+  # Install Docker and run VulnGuard-AI container
   user_data = <<-EOF
               #!/bin/bash
+              # Update OS and install Docker
               yum update -y
-              amazon-linux-extras install docker -y
+              amazon-linux-extras enable docker -y
+              yum install docker -y
               systemctl start docker
               systemctl enable docker
               usermod -a -G docker ec2-user
 
-              # Docker login and pull image
+              # Login to DockerHub and run container
               docker login -u ${var.docker_username} -p ${var.docker_password}
               docker pull vuln-guard-ai
               docker run -d -p 80:8000 --restart unless-stopped --name vulnguard-ai vuln-guard-ai
@@ -61,4 +63,9 @@ resource "aws_instance" "vgai_server" {
   tags = {
     Name = "VulnGuardAI-Server"
   }
+}
+
+# Output the public IP of the EC2 instance
+output "vgai_server_public_ip" {
+  value = aws_instance.vgai_server.public_ip
 }
