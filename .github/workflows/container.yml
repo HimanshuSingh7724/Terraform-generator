@@ -17,7 +17,7 @@ jobs:
       KEY_NAME: ${{ secrets.MY_KEY }}
     defaults:
       run:
-        working-directory: ./VulnGuard-AI   # Set working directory for all run steps
+        working-directory: ./VulnGuard-AI   # Set working directory
 
     steps:
       - uses: actions/checkout@v3
@@ -42,7 +42,7 @@ jobs:
       - name: Setup Terraform
         uses: hashicorp/setup-terraform@v3
         with:
-          terraform_version: 1.7.5   # Compatible Terraform version
+          terraform_version: 1.7.5
           terraform_wrapper: true
 
       - name: Terraform Init
