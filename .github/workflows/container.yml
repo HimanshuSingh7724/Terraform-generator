@@ -42,11 +42,11 @@ jobs:
       - name: Setup Terraform
         uses: hashicorp/setup-terraform@v2
         with:
-          terraform_version: 1.7.7   # Tumhari required version yaha set kar sakte ho
+          terraform_version: 1.7.7   # Required Terraform version
 
       - name: Terraform Init
         run: terraform init
-        working-directory: ./terraform  # Terraform folder override
+        working-directory: ./terraform
 
       - name: Terraform Apply
         run: terraform apply -auto-approve \
