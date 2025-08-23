@@ -39,6 +39,11 @@ jobs:
           curl -L https://github.com/aquasecurity/trivy/releases/latest/download/trivy_0.49.0_Linux-64bit.deb -o trivy.deb
           sudo dpkg -i trivy.deb || sudo apt-get install -f -y
 
+      - name: Setup Terraform
+        uses: hashicorp/setup-terraform@v2
+        with:
+          terraform_version: 1.7.7   # Tumhari required version yaha set kar sakte ho
+
       - name: Terraform Init
         run: terraform init
         working-directory: ./terraform  # Terraform folder override
