@@ -2,7 +2,7 @@ provider "aws" {
   region = var.region
 }
 
-# Security Group
+# Security Group for VulnGuard-AI
 resource "aws_security_group" "vgai_sg" {
   name        = "vgai-sg"
   description = "Allow SSH and HTTP"
@@ -36,9 +36,9 @@ resource "aws_security_group" "vgai_sg" {
   }
 }
 
-# EC2 Instance
+# EC2 Instance with Auto Docker Setup
 resource "aws_instance" "vgai_server" {
-  ami                    = "ami-0fa3a4915333e2850"
+  ami                    = "ami-0fa3a4915333e2850" # Amazon Linux 2 in us-west-1
   instance_type           = "t2.micro"
   key_name                = var.key_name
   vpc_security_group_ids  = [aws_security_group.vgai_sg.id]
@@ -46,14 +46,18 @@ resource "aws_instance" "vgai_server" {
   user_data = <<-EOF
               #!/bin/bash
               yum update -y
+              amazon-linux-extras enable docker
               amazon-linux-extras install docker -y
               systemctl start docker
               systemctl enable docker
               usermod -a -G docker ec2-user
 
-              docker login -u ${var.docker_username} -p ${var.docker_password}
-              docker pull vuln-guard-ai
-              docker run -d -p 80:8000 --restart unless-stopped --name vulnguard-ai vuln-guard-ai
+              # Docker Login
+              echo "${var.docker_password}" | docker login -u "${var.docker_username}" --password-stdin
+
+              # Pull and Run Container
+              docker pull vuln-guard-ai:latest
+              docker run -d -p 80:8000 --restart unless-stopped --name vulnguard-ai vuln-guard-ai:latest
               EOF
 
   tags = {
