@@ -17,7 +17,7 @@ jobs:
       KEY_NAME: ${{ secrets.MY_KEY }}
     defaults:
       run:
-        working-directory: ./VulnGuard-AI/terraform
+        working-directory: ./VulnGuard-AI
 
     steps:
       - uses: actions/checkout@v3
