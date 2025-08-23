@@ -50,10 +50,7 @@ jobs:
         working-directory: ./VulnGuard-AI/terraform
 
       - name: Terraform Apply
-        run: terraform apply -auto-approve \
-            -var "docker_username=${{ secrets.DOCKER_USERNAME }}" \
-            -var "docker_password=${{ secrets.DOCKER_PASSWORD }}" \
-            -var "key_name=${{ secrets.MY_KEY }}"
+        run: terraform apply -auto-approve -var "docker_username=${{ secrets.DOCKER_USERNAME }}" -var "docker_password=${{ secrets.DOCKER_PASSWORD }}" -var "key_name=${{ secrets.MY_KEY }}"
         working-directory: ./VulnGuard-AI/terraform
 
       - name: Run VulnGuard-AI Scan
