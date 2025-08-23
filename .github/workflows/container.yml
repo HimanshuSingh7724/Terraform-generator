@@ -50,7 +50,8 @@ jobs:
         working-directory: ./VulnGuard-AI/terraform
 
       - name: Terraform Apply
-        run: terraform apply -auto-approve \
+        run: |
+          terraform apply -auto-approve \
             -var "docker_username=${{ secrets.DOCKER_USERNAME }}" \
             -var "docker_password=${{ secrets.DOCKER_PASSWORD }}" \
             -var "key_name=${{ secrets.MY_KEY }}"
@@ -60,7 +61,8 @@ jobs:
         working-directory: ./VulnGuard-AI
         env:
           PYTHONPATH: ./VulnGuard-AI
-        run: python -m cli.vgai \
+        run: |
+          python -m cli.vgai \
             --path ./examples/vulnerable_app \
             --dockerfile ./examples/vulnerable_app/Dockerfile \
             --requirements ./examples/vulnerable_app/requirements.txt \
