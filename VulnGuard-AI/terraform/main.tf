@@ -45,19 +45,27 @@ resource "aws_instance" "vgai_server" {
 
   user_data = <<-EOF
               #!/bin/bash
+              set -ex
+
+              # Update system
               yum update -y
+
+              # Install docker
               amazon-linux-extras enable docker
               amazon-linux-extras install docker -y
               systemctl start docker
               systemctl enable docker
               usermod -a -G docker ec2-user
 
-              # Docker Login
+              # Install git (in case needed for future)
+              yum install -y git
+
+              # Docker login
               echo "${var.docker_password}" | docker login -u "${var.docker_username}" --password-stdin
 
-              # Pull and Run Container
-              docker pull vuln-guard-ai:latest
-              docker run -d -p 80:8000 --restart unless-stopped --name vulnguard-ai vuln-guard-ai:latest
+              # Pull and run container
+              docker pull ${var.docker_username}/vuln-guard-ai:latest
+              docker run -d -p 80:8000 --restart unless-stopped --name vulnguard-ai ${var.docker_username}/vuln-guard-ai:latest
               EOF
 
   tags = {
