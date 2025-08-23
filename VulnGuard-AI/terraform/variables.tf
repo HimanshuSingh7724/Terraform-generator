@@ -1,15 +1,20 @@
 variable "region" {
-  default = "us-west-1"
+  description = "AWS region"
+  type        = string
+  default     = "us-east-1"
 }
 
 variable "key_name" {
-  default = "my_key"
+  description = "EC2 Key Pair name"
+  type        = string
 }
 
 variable "docker_username" {
-  description = "Docker Hub Username"
+  description = "Docker Hub username"
+  type        = string
 }
 
 variable "docker_password" {
-  description = "Docker Hub Password"
+  description = "Docker Hub password"
+  type        = string
 }
