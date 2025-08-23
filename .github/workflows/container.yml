@@ -15,21 +15,19 @@ jobs:
       DOCKER_USERNAME: ${{ secrets.DOCKER_USERNAME }}
       DOCKER_PASSWORD: ${{ secrets.DOCKER_PASSWORD }}
       KEY_NAME: ${{ secrets.MY_KEY }}
-
     defaults:
       run:
-        working-directory: ./VulnGuard-AI   # Set working directory for all run steps
+        working-directory: ./VulnGuard-AI
 
     steps:
-      - name: Checkout repository
-        uses: actions/checkout@v3
+      - uses: actions/checkout@v3
 
       - name: Set up Python
         uses: actions/setup-python@v4
         with:
           python-version: "3.11"
 
-      - name: Install Python dependencies
+      - name: Install dependencies
         run: |
           python -m pip install --upgrade pip
           pip install -r requirements.txt
@@ -44,7 +42,7 @@ jobs:
       - name: Setup Terraform
         uses: hashicorp/setup-terraform@v3
         with:
-          terraform_version: 1.7.5   # Compatible version
+          terraform_version: 1.7.5
           terraform_wrapper: true
 
       - name: Terraform Init
@@ -59,8 +57,4 @@ jobs:
         working-directory: ./terraform
 
       - name: Run VulnGuard-AI Scan
-        run: python cli/vgai.py \
-            --path ./examples/vulnerable_app \
-            --dockerfile ./examples/vulnerable_app/Dockerfile \
-            --requirements ./examples/vulnerable_app/requirements.txt \
-            --apply
+        run: python cli/vgai.py --path ./examples/vulnerable_app --dockerfile ./examples/vulnerable_app/Dockerfile --requirements ./examples/vulnerable_app/requirements.txt --apply
