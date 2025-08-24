@@ -8,6 +8,7 @@ on:
 jobs:
   deploy-and-scan:
     runs-on: ubuntu-latest
+
     env:
       AWS_ACCESS_KEY_ID: ${{ secrets.AWS_ACCESS_KEY }}
       AWS_SECRET_ACCESS_KEY: ${{ secrets.AWS_SECRET_KEY }}
@@ -15,6 +16,7 @@ jobs:
       DOCKER_USERNAME: ${{ secrets.DOCKER_USERNAME }}
       DOCKER_PASSWORD: ${{ secrets.DOCKER_PASSWORD }}
       KEY_NAME: ${{ secrets.MY_KEY }}
+
     defaults:
       run:
         working-directory: ./VulnGuard-AI
@@ -59,10 +61,29 @@ jobs:
       - name: Terraform Apply
         run: |
           terraform apply -auto-approve \
-            -var "docker_username=${{ secrets.DOCKER_USERNAME }}" \
-            -var "docker_password=${{ secrets.DOCKER_PASSWORD }}" \
-            -var "key_name=${{ secrets.MY_KEY }}"
+          -var "docker_username=${{ secrets.DOCKER_USERNAME }}" \
+          -var "docker_password=${{ secrets.DOCKER_PASSWORD }}" \
+          -var "key_name=${{ secrets.MY_KEY }}"
         working-directory: ./VulnGuard-AI/terraform
+
+      - name: Get EC2 Public IP
+        id: ec2ip
+        run: |
+          echo "EC2_IP=$(terraform output -raw ec2_public_ip)" >> $GITHUB_ENV
+        working-directory: ./VulnGuard-AI/terraform
+
+      - name: Add SSH Key
+        run: |
+          echo "${{ secrets.EC2_PRIVATE_KEY }}" > private_key.pem
+          chmod 600 private_key.pem
+
+      - name: Deploy Docker on EC2
+        run: |
+          ssh -o StrictHostKeyChecking=no -i private_key.pem ec2-user@$EC2_IP "
+            sudo docker stop vulnguard-container || true && sudo docker rm vulnguard-container || true
+            sudo docker pull ${{ secrets.DOCKER_USERNAME }}/vuln-guard-ai:latest
+            sudo docker run -d -p 80:8000 --name vulnguard-container ${{ secrets.DOCKER_USERNAME }}/vuln-guard-ai:latest
+          "
 
       - name: Run VulnGuard-AI Scan
         working-directory: ./VulnGuard-AI
@@ -72,5 +93,4 @@ jobs:
           python -m cli.vgai \
             --path ./examples/vulnerable_app \
             --dockerfile ./examples/vulnerable_app/Dockerfile \
-            --requirements ./examples/vulnerable_app/requirements.txt \
-            --apply
+            --requirements ./examples/vulnerable_app/requirements.txt
