@@ -59,10 +59,6 @@ resource "aws_instance" "vgai_server" {
               # Install Git
               yum install -y git
 
-              # Install Docker Compose (optional future use)
-              curl -L "https://github.com/docker/compose/releases/latest/download/docker-compose-$(uname -s)-$(uname -m)" -o /usr/local/bin/docker-compose
-              chmod +x /usr/local/bin/docker-compose
-
               # Docker login
               echo "${var.docker_password}" | docker login -u "${var.docker_username}" --password-stdin
 
@@ -81,6 +77,6 @@ resource "aws_instance" "vgai_server" {
 }
 
 # Output the public IP of the instance
-output "vgai_public_ip" {
+output "ec2_public_ip" {
   value = aws_instance.vgai_server.public_ip
 }
