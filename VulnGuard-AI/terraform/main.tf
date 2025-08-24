@@ -46,21 +46,29 @@ resource "aws_instance" "vgai_server" {
   user_data = <<-EOF
               #!/bin/bash
               set -ex
+              
               # Update system
               yum update -y
 
               # Install Docker
-              amazon-linux-extras enable docker
-              amazon-linux-extras install docker -y
-              systemctl start docker
+              yum install -y docker
               systemctl enable docker
-              usermod -a -G docker ec2-user
+              systemctl start docker
+              usermod -aG docker ec2-user
 
               # Install Git
               yum install -y git
 
+              # Install Docker Compose (optional future use)
+              curl -L "https://github.com/docker/compose/releases/latest/download/docker-compose-$(uname -s)-$(uname -m)" -o /usr/local/bin/docker-compose
+              chmod +x /usr/local/bin/docker-compose
+
               # Docker login
               echo "${var.docker_password}" | docker login -u "${var.docker_username}" --password-stdin
+
+              # Stop old container if running
+              docker stop vulnguard-ai || true
+              docker rm vulnguard-ai || true
 
               # Pull and run container
               docker pull ${var.docker_username}/vuln-guard-ai:latest
