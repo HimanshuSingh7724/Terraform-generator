@@ -38,26 +38,25 @@ resource "aws_security_group" "vgai_sg" {
 
 # EC2 Instance with Auto Docker Setup
 resource "aws_instance" "vgai_server" {
-  ami                    = "ami-0fa3a4915333e2850" # Amazon Linux 2 in us-west-1
-  instance_type           = "t2.micro"
-  key_name                = var.key_name
-  vpc_security_group_ids  = [aws_security_group.vgai_sg.id]
+  ami                    = "ami-0fa3a4915333e2850" # Amazon Linux 2023 (us-west-1)
+  instance_type          = "t2.micro"
+  key_name               = var.key_name
+  vpc_security_group_ids = [aws_security_group.vgai_sg.id]
 
   user_data = <<-EOF
               #!/bin/bash
               set -ex
-
               # Update system
               yum update -y
 
-              # Install docker
+              # Install Docker
               amazon-linux-extras enable docker
               amazon-linux-extras install docker -y
               systemctl start docker
               systemctl enable docker
               usermod -a -G docker ec2-user
 
-              # Install git (in case needed for future)
+              # Install Git
               yum install -y git
 
               # Docker login
@@ -71,4 +70,9 @@ resource "aws_instance" "vgai_server" {
   tags = {
     Name = "VulnGuardAI-Server"
   }
+}
+
+# Output the public IP of the instance
+output "vgai_public_ip" {
+  value = aws_instance.vgai_server.public_ip
 }
