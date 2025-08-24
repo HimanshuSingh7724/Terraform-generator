@@ -3,7 +3,7 @@ name: VulnGuard-AI CI/CD
 on:
   push:
     branches: [ main ]
-  pull_request:
+  pull_request:  
 
 jobs:
   deploy-and-scan:
