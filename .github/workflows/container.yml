@@ -66,29 +66,23 @@ jobs:
           -var "key_name=${{ secrets.MY_KEY }}"
         working-directory: ./VulnGuard-AI/terraform
 
+      - name: Debug Terraform Outputs
+        run: terraform output
+        working-directory: ./VulnGuard-AI/terraform
+
       - name: Get EC2 Public IP
         id: ec2ip
         run: |
-          echo "EC2_IP=$(terraform output -raw ec2_public_ip)" >> $GITHUB_ENV
+          PUBLIC_IP=$(terraform output -raw ec2_public_ip)
+          echo "EC2_IP=$PUBLIC_IP" >> $GITHUB_ENV
+          echo "Public IP is: $PUBLIC_IP"
         working-directory: ./VulnGuard-AI/terraform
-
-      - name: Add SSH Key
-        run: |
-          echo "${{ secrets.EC2_PRIVATE_KEY }}" > private_key.pem
-          chmod 600 private_key.pem
-
-      - name: Deploy Docker on EC2
-        run: |
-          ssh -o StrictHostKeyChecking=no -i private_key.pem ec2-user@$EC2_IP "
-            sudo docker stop vulnguard-container || true && sudo docker rm vulnguard-container || true
-            sudo docker pull ${{ secrets.DOCKER_USERNAME }}/vuln-guard-ai:latest
-            sudo docker run -d -p 80:8000 --name vulnguard-container ${{ secrets.DOCKER_USERNAME }}/vuln-guard-ai:latest
-          "
 
       - name: Run VulnGuard-AI Scan
         working-directory: ./VulnGuard-AI
         env:
           PYTHONPATH: ./VulnGuard-AI
+          API_URL: http://${{ env.EC2_IP }}/docs
         run: |
           python -m cli.vgai \
             --path ./examples/vulnerable_app \
